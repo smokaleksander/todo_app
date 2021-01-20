@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import './../models/dummy-data.dart';
-import './../widgets/project_item.dart';
+import 'package:provider/provider.dart';
+import '../widgets/project_list.dart';
+import 'package:pomodoro_app/models/project_provider.dart';
+import 'package:pomodoro_app/models/task_provider.dart';
 
 class ProjectsScreen extends StatefulWidget {
   //bar for storting screen path
-  static const routeName = 'projects';
+  static const route = '/projects';
 
   @override
   _ProjectsScreenState createState() => _ProjectsScreenState();
@@ -13,21 +15,6 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GridView(
-        padding: const EdgeInsets.all(15),
-        children:
-            //map every project from list to single item to show in grid
-            DUMMY_PROJECTS
-                .map((project) => ProjectItem(project.id, project.title))
-                .toList(),
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 3 / 2,
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 20,
-        ),
-      ),
-    );
+    return Scaffold(body: ProjectList());
   }
 }

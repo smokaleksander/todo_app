@@ -1,51 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/models/task.dart';
+import 'package:pomodoro_app/widgets/task_item.dart';
 
-class TaskList extends StatefulWidget {
-  final List<Task> tasks;
+class TaskList extends StatelessWidget {
+  final bool showToDo;
+  final String projectId;
+  TaskList(this.showToDo, [this.projectId = 'empty']);
 
-  TaskList(this.tasks);
-
-  @override
-  _TaskListState createState() => _TaskListState();
-}
-
-class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 500,
-      child: ListView.builder(
-        itemBuilder: (ctx, index) {
-          return Card(
-            margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  child: Checkbox(
-                    value: widget.tasks[index].isDone,
-                    onChanged: (bool value) {
-                      setState(() {
-                        widget.tasks[index].isDone = value;
-                      });
-                    },
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      widget.tasks[index].title,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
-        itemCount: widget.tasks.length,
+    List<Task> tasks;
+    //provider implementation
+    final tasksData = Provider.of<TaskProvider>(context);
+    if (projectId == 'empty') {
+      tasks = showToDo ? tasksData.toDoTasks : tasksData.doneTasks;
+    } else {
+      // tasks = tasksData
+      //     .findbyProjectId(projectId)
+      //     .where((ts) => ts.isDone != showToDo)
+      //     .toList();
+    }
+    //actual widget ui build
+    return ListView.builder(
+      itemCount: tasks.length,
+      itemBuilder: (context, index) => ChangeNotifierProvider.value(
+        value: tasks[index],
+        child: TaskItem(),
       ),
     );
   }

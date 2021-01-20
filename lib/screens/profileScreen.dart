@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
+  static const route = '/profile';
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }

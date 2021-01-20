@@ -12,35 +12,32 @@ class TaskForm extends StatefulWidget {
 }
 
 class _TaskFormState extends State<TaskForm> {
-  final _titleController = TextEditingController();
-  DateTime _selectedDate;
+  // void _addTaskFormSubmit() {
+  //   final enteredTitle = _titleController.text;
 
-  void _addTaskFormSubmit() {
-    final enteredTitle = _titleController.text;
+  //   if (enteredTitle.isEmpty) {
+  //     return;
+  //   }
+  //   widget.addTs(enteredTitle, _selectedDate);
 
-    if (enteredTitle.isEmpty) {
-      return;
-    }
-    widget.addTs(enteredTitle, _selectedDate);
+  //   Navigator.of(context).pop();
+  // }
 
-    Navigator.of(context).pop();
-  }
-
-  void _showTaskDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2019),
-            lastDate: DateTime(2050))
-        .then((pickedDate) {
-      if (pickedDate == null) {
-        return;
-      }
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    });
-  }
+  // void _showTaskDatePicker() {
+  //   showDatePicker(
+  //           context: context,
+  //           initialDate: DateTime.now(),
+  //           firstDate: DateTime(2019),
+  //           lastDate: DateTime(2050))
+  //       .then((pickedDate) {
+  //     if (pickedDate == null) {
+  //       return;
+  //     }
+  //     setState(() {
+  //       _selectedDate = pickedDate;
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StatisticsScreen extends StatefulWidget {
+  static const route = '/statistics';
   @override
   _StatisticsScreenState createState() => _StatisticsScreenState();
 }

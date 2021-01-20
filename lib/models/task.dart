@@ -1,17 +1,22 @@
 import 'package:flutter/foundation.dart';
 
-class Task {
+class Task with ChangeNotifier {
   final String id;
   String title;
   DateTime date;
   String projectId;
-  bool isDone = false;
+  bool isDone;
 
   Task({
     @required this.id,
     @required this.title,
     this.date,
     this.projectId,
-    bool isDone,
+    this.isDone = false,
   });
+
+  void toggleIsDone() {
+    isDone = !isDone;
+    notifyListeners();
+  }
 }

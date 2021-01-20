@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Project {
+class Project with ChangeNotifier {
   final String id;
   final String title;
 
