@@ -37,7 +37,7 @@ class _BottomNavManagerState extends State<BottomNavManager> {
           BottomNavigationBarItem(
               icon: Icon(Icons.lightbulb), label: 'Projects'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_rounded), label: 'Home'),
+              icon: Icon(Icons.bar_chart_rounded), label: 'Statistics'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

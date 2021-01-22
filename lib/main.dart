@@ -1,14 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/screens/StatisticsScreen.dart';
 import 'package:pomodoro_app/screens/profileScreen.dart';
+import 'package:pomodoro_app/screens/task_form_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/screens/ProjectDetailScreen.dart';
 import 'package:pomodoro_app/screens/bottomNavManager.dart';
 import 'package:pomodoro_app/screens/homeScreen.dart';
 import 'package:pomodoro_app/screens/ProjectsScreen.dart';
+import './screens/task_form_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
           ProjectsScreen.route: (ctx) => ProjectsScreen(),
           ProjectDetailScreen.route: (ctx) => ProjectDetailScreen(),
           ProfileScreen.route: (ctx) => ProfileScreen(),
-          StatisticsScreen.route: (ctx) => StatisticsScreen()
+          StatisticsScreen.route: (ctx) => StatisticsScreen(),
+          TaskFormScreen.route: (ctx) => TaskFormScreen(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

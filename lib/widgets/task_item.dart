@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
-import 'package:pomodoro_app/screens/homeScreen.dart';
 import 'package:provider/provider.dart';
-import './../models/task.dart';
+import './../screens/task_form_screen.dart';
 
 class TaskItem extends StatelessWidget {
   final String id;
@@ -13,7 +12,6 @@ class TaskItem extends StatelessWidget {
   String projectId;
 
   TaskItem({this.title, this.date, this.isDone, this.projectId, this.id});
-  void showTaskDetails() {}
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +55,9 @@ class TaskItem extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(8, 8, 8, 0),
       ),
       child: InkWell(
-        onTap: showTaskDetails,
+        onTap: () {
+          Navigator.of(context).pushNamed(TaskFormScreen.route);
+        },
         child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -78,7 +78,7 @@ class TaskItem extends StatelessWidget {
                     ),
                     if (date != null)
                       Text(
-                        DateFormat('dd/MM/yyyy hh:mm').format(date),
+                        DateFormat('dd/MM/yyyy').format(date),
                         style: TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w200),
                       )

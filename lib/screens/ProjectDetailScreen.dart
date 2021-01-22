@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
-import 'package:pomodoro_app/widgets/task_list.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/widgets/task_item.dart';

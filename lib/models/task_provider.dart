@@ -73,6 +73,10 @@ class TaskProvider with ChangeNotifier {
     return _tasks.where((ts) => ts.isDone == true).toList();
   }
 
+  Task findById(id) {
+    return _tasks.firstWhere((ts) => ts.id == id);
+  }
+
   List<Task> findbyDate() {}
   //getter for fetching copy of list of task
 
@@ -87,6 +91,17 @@ class TaskProvider with ChangeNotifier {
 
   void changeStatus(String id) {
     (_tasks.firstWhere((ts) => ts.id == id)).toggleIsDone();
+    notifyListeners();
+  }
+
+  void addTask(Task task) {
+    final newTask = Task(
+        id: DateTime.now().toString(),
+        title: task.title,
+        date: task.date,
+        isDone: task.isDone,
+        projectId: task.projectId);
+    _tasks.add(newTask);
     notifyListeners();
   }
 }

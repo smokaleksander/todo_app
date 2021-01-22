@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 
 class Task with ChangeNotifier {
   final String id;
-  String title;
-  DateTime date;
-  String projectId;
+  final String title;
+  final DateTime date;
+  final String projectId;
   bool isDone;
 
   Task({

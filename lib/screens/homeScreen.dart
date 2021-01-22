@@ -4,8 +4,7 @@ import 'package:pomodoro_app/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/models/task.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
-import 'package:pomodoro_app/widgets/task_form.dart';
-import 'package:pomodoro_app/widgets/task_list.dart';
+import './task_form_screen.dart';
 
 enum FilterOptions {
   Done,
@@ -26,15 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  void showNewTaskModal(BuildContext ctx) {
-    showModalBottomSheet(
-      context: ctx,
-      builder: (_) {
-        //pass context to modal bottom builder
-        return TaskForm(_addNewTask);
-      },
-    );
-  }
+  void showNewTaskModal(BuildContext ctx) {}
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(TaskFormScreen.route);
+        },
       ),
       body: ListView.builder(
         itemCount: tasks.length,
