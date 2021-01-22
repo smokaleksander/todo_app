@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/project.dart';
+import 'package:pomodoro_app/models/project_provider.dart';
 import './../widgets/date_dialog.dart';
 import './../widgets/project_dialog.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ class TaskFormScreen extends StatefulWidget {
 }
 
 class _TaskFormScreenState extends State<TaskFormScreen> {
+  String _titleInitialValue;
   final _dateFieldController = TextEditingController()..text = 'No duedate';
   final _projectFieldController = TextEditingController()..text = 'No project';
   final _form = GlobalKey<FormState>();
@@ -22,6 +24,32 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   var _choosenProject = Project(id: null, title: null);
   var _editedTask =
       Task(id: null, title: '', date: null, isDone: false, projectId: null);
+  //var for loading task when in editing mode
+  var _isInit = true;
+  //check if argument passed in route wchich means editting mode
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final taskId = ModalRoute.of(context).settings.arguments as String;
+      if (taskId != null) {
+        _editedTask =
+            Provider.of<TaskProvider>(context, listen: false).findById(taskId);
+        _titleInitialValue = _editedTask.title;
+        if (_editedTask.date != null) {
+          _dateFieldController.text =
+              DateFormat('dd/MM/yyyy').format(_editedTask.date).toString();
+        }
+        if (_editedTask.projectId != null) {
+          _projectFieldController.text =
+              Provider.of<ProjectProvider>(context, listen: false)
+                  .findById(_editedTask.projectId)
+                  .title;
+        }
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   void dispose() {
@@ -37,7 +65,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       return;
     }
     _form.currentState.save();
-    Provider.of<TaskProvider>(context, listen: false).addTask(_editedTask);
+    if (_editedTask.id != null) {
+      Provider.of<TaskProvider>(context, listen: false)
+          .updateTask(_editedTask.id, _editedTask);
+      print(_editedTask.projectId);
+    } else {
+      Provider.of<TaskProvider>(context, listen: false).addTask(_editedTask);
+      print(_editedTask.projectId);
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -76,7 +112,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               children: <Widget>[
                 Container(
                   child: TextFormField(
-                    initialValue: _editedTask.title,
+                    initialValue: _titleInitialValue,
                     focusNode: _titleFocusNode,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
@@ -86,7 +122,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                             TextStyle(color: Theme.of(context).accentColor)),
                     onSaved: (value) {
                       _editedTask = Task(
-                          id: null,
+                          id: _editedTask.id,
                           title: value,
                           projectId: _editedTask.projectId,
                           date: _editedTask.date,
@@ -103,7 +139,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 InkWell(
                   onTap: () => _chooseDate(context).then((onValue) {
                     setState(() {
-                      _dateFieldController.text = onValue;
+                      if (onValue == null) {
+                        _dateFieldController.text = 'No duedate';
+                      } else {
+                        _dateFieldController.text = onValue;
+                      }
                     });
                   }),
                   child: Container(
@@ -121,17 +161,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                         if (value.contains('No duedate') ||
                             value == null ||
                             value.isEmpty) {
-                          print('no date');
                           _editedTask = Task(
-                              id: null,
+                              id: _editedTask.id,
                               title: _editedTask.title,
                               projectId: _editedTask.projectId,
                               date: null,
                               isDone: _editedTask.isDone);
                         } else {
-                          print('date');
                           _editedTask = Task(
-                              id: null,
+                              id: _editedTask.id,
                               title: _editedTask.title,
                               projectId: _editedTask.projectId,
                               date: DateFormat('dd/MM/yyyy').parse(value),
@@ -145,7 +183,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   onTap: () => _chooseProject(context).then((onValue) {
                     setState(() {
                       _projectFieldController.text = onValue.title;
-                      if (onValue.id != null) {
+                      if (onValue.id == null) {
+                        _projectFieldController.text = 'No project';
+                        _choosenProject = Project(id: null, title: null);
+                      } else {
+                        _projectFieldController.text = onValue.title;
                         _choosenProject =
                             Project(id: onValue.id, title: onValue.title);
                       }
@@ -165,9 +207,16 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       onSaved: (value) {
                         if (value != 'No project') {
                           _editedTask = Task(
-                              id: null,
+                              id: _editedTask.id,
                               title: _editedTask.title,
                               projectId: _choosenProject.id,
+                              date: _editedTask.date,
+                              isDone: _editedTask.isDone);
+                        } else {
+                          _editedTask = Task(
+                              id: _editedTask.id,
+                              title: _editedTask.title,
+                              projectId: null,
                               date: _editedTask.date,
                               isDone: _editedTask.isDone);
                         }
@@ -184,7 +233,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       color: Theme.of(context).accentColor,
                       textColor: Theme.of(context).primaryColor,
                       child: Text(
-                        'Create task',
+                        _editedTask.id == null ? 'Create task' : 'Save task',
                       ),
                       onPressed: _taskFormSubmit,
                     ),

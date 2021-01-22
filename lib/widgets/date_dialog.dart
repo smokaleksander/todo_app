@@ -41,7 +41,7 @@ class DateDialog extends StatelessWidget {
       ),
       SimpleDialogOption(
         onPressed: () {
-          Navigator.pop(context, 'No duedate');
+          Navigator.pop(context, null);
         },
         child: const Text('No duedate'),
       ),

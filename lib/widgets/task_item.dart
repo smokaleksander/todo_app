@@ -56,7 +56,7 @@ class TaskItem extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(TaskFormScreen.route);
+          Navigator.of(context).pushNamed(TaskFormScreen.route, arguments: id);
         },
         child: Card(
           shape:

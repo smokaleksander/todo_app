@@ -14,7 +14,7 @@ class ProjectDialog extends StatelessWidget {
         children: <Widget>[
           SimpleDialogOption(
             onPressed: () {
-              Navigator.pop(context, Project(id: null, title: 'No project'));
+              Navigator.pop(context, Project(id: null, title: 'null'));
             },
             child: Text('No project'),
           ),
@@ -22,7 +22,7 @@ class ProjectDialog extends StatelessWidget {
             SimpleDialogOption(
               onPressed: () {
                 Navigator.pop(context,
-                    Project(id: projects[i].title, title: projects[i].title));
+                    Project(id: projects[i].id, title: projects[i].title));
               },
               child: Text(projects[i].title),
             ),

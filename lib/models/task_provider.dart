@@ -104,4 +104,10 @@ class TaskProvider with ChangeNotifier {
     _tasks.add(newTask);
     notifyListeners();
   }
+
+  void updateTask(String id, Task updatedTask) {
+    final taskIndex = _tasks.indexWhere((task) => task.id == id);
+    _tasks[taskIndex] = updatedTask;
+    notifyListeners();
+  }
 }
