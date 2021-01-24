@@ -16,6 +16,7 @@ class TaskFormScreen extends StatefulWidget {
 }
 
 class _TaskFormScreenState extends State<TaskFormScreen> {
+  bool _isProjectScoped = false;
   String _titleInitialValue;
   final _dateFieldController = TextEditingController()..text = 'No duedate';
   final _projectFieldController = TextEditingController()..text = 'No project';
@@ -30,7 +31,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      final taskId = ModalRoute.of(context).settings.arguments as String;
+      final args = ModalRoute.of(context).settings.arguments as Map;
+      final taskId = args['taskId'];
+      final projectId = args['projectId'];
       if (taskId != null) {
         _editedTask =
             Provider.of<TaskProvider>(context, listen: false).findById(taskId);
@@ -45,6 +48,12 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   .findById(_editedTask.projectId)
                   .title;
         }
+      }
+      if (projectId != null) {
+        _choosenProject = Provider.of<ProjectProvider>(context, listen: false)
+            .findById(projectId);
+        _projectFieldController.text = _choosenProject.title;
+        _isProjectScoped = true;
       }
     }
     _isInit = false;
@@ -68,10 +77,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     if (_editedTask.id != null) {
       Provider.of<TaskProvider>(context, listen: false)
           .updateTask(_editedTask.id, _editedTask);
-      print(_editedTask.projectId);
     } else {
       Provider.of<TaskProvider>(context, listen: false).addTask(_editedTask);
-      print(_editedTask.projectId);
     }
 
     Navigator.of(context).pop();
@@ -95,14 +102,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // if (widget.taskId != null) {
-    //   _editedTask = Provider.of<TaskProvider>(context, listen: false)
-    //       .findById(widget.taskId);
-    // }
-
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
+      appBar: AppBar(
+          title:
+              Text(_editedTask.id == null ? 'Create new task' : 'Edit Task')),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Container(
@@ -157,7 +161,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                               TextStyle(color: Theme.of(context).accentColor)),
                       keyboardType: TextInputType.datetime,
                       onSaved: (value) {
-                        print(value);
                         if (value.contains('No duedate') ||
                             value == null ||
                             value.isEmpty) {
@@ -180,19 +183,43 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap: () => _chooseProject(context).then((onValue) {
-                    setState(() {
-                      _projectFieldController.text = onValue.title;
-                      if (onValue.id == null) {
-                        _projectFieldController.text = 'No project';
-                        _choosenProject = Project(id: null, title: null);
-                      } else {
-                        _projectFieldController.text = onValue.title;
-                        _choosenProject =
-                            Project(id: onValue.id, title: onValue.title);
+                  onTap: () => {
+                    if (!_isProjectScoped)
+                      {
+                        _chooseProject(context).then((onValue) {
+                          setState(() {
+                            _projectFieldController.text = onValue.title;
+                            if (onValue.id == null) {
+                              _projectFieldController.text = 'No project';
+                              _choosenProject = Project(id: null, title: null);
+                            } else {
+                              _projectFieldController.text = onValue.title;
+                              _choosenProject =
+                                  Project(id: onValue.id, title: onValue.title);
+                            }
+                          });
+                        })
                       }
-                    });
-                  }),
+                    else
+                      {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Text(_projectFieldController.text),
+                            content: Text(
+                                'You can`t assign task to different project'),
+                            actions: [
+                              FlatButton(
+                                child: Text('Ok'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              )
+                            ],
+                          ),
+                        )
+                      }
+                  },
                   child: Container(
                     margin: EdgeInsets.only(top: 4, bottom: 16),
                     width: double.infinity,

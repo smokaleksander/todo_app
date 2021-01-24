@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/project.dart';
 import './task.dart';
 
 class TaskProvider with ChangeNotifier {
@@ -28,7 +29,7 @@ class TaskProvider with ChangeNotifier {
       isDone: true,
     ),
     Task(
-      id: 't4',
+      id: 't5',
       title: 'task5',
       projectId: 'c2',
       isDone: false,
@@ -84,11 +85,6 @@ class TaskProvider with ChangeNotifier {
     return [..._tasks]; //get copy of list intead of reference
   }
 
-  void deleteTask(String id) {
-    _tasks.removeWhere((ts) => ts.id == id);
-    notifyListeners();
-  }
-
   void changeStatus(String id) {
     (_tasks.firstWhere((ts) => ts.id == id)).toggleIsDone();
     notifyListeners();
@@ -102,12 +98,38 @@ class TaskProvider with ChangeNotifier {
         isDone: task.isDone,
         projectId: task.projectId);
     _tasks.add(newTask);
+
     notifyListeners();
   }
 
   void updateTask(String id, Task updatedTask) {
     final taskIndex = _tasks.indexWhere((task) => task.id == id);
     _tasks[taskIndex] = updatedTask;
+    notifyListeners();
+  }
+
+  void deleteTask(String id) {
+    _tasks.removeWhere((ts) => ts.id == id);
+    notifyListeners();
+  }
+
+  void deleteTasksWithProjectId(String projectId) {
+    _tasks.removeWhere((ts) => ts.projectId == projectId);
+    notifyListeners();
+  }
+
+  void setTasksProjectIdToNull(String projectId) {
+    for (var i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].projectId == projectId) {
+        Task oldtask = _tasks[i];
+        _tasks[i] = Task(
+            projectId: null,
+            id: oldtask.id,
+            title: oldtask.title,
+            date: oldtask.date,
+            isDone: oldtask.isDone);
+      }
+    }
     notifyListeners();
   }
 }

@@ -3,13 +3,13 @@ import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/screens/StatisticsScreen.dart';
 import 'package:pomodoro_app/screens/profileScreen.dart';
-import 'package:pomodoro_app/screens/task_form_screen.dart';
+import 'package:pomodoro_app/screens/projectFormScreen.dart';
+import 'package:pomodoro_app/screens/taskFormScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/screens/ProjectDetailScreen.dart';
 import 'package:pomodoro_app/screens/bottomNavManager.dart';
 import 'package:pomodoro_app/screens/homeScreen.dart';
 import 'package:pomodoro_app/screens/ProjectsScreen.dart';
-import './screens/task_form_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
           ProfileScreen.route: (ctx) => ProfileScreen(),
           StatisticsScreen.route: (ctx) => StatisticsScreen(),
           TaskFormScreen.route: (ctx) => TaskFormScreen(),
+          ProjectFormScreen.route: (ctx) => ProjectFormScreen(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

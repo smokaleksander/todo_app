@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/widgets/project_item.dart';
+import './../models/project_provider.dart';
 import 'package:provider/provider.dart';
-import '../widgets/project_list.dart';
-import 'package:pomodoro_app/models/project_provider.dart';
-import 'package:pomodoro_app/models/task_provider.dart';
+import './projectFormScreen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   //bar for storting screen path
@@ -15,6 +15,34 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: ProjectList());
+    final projectsData = Provider.of<ProjectProvider>(context);
+    final projects = projectsData.projects;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Your Projects'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(8),
+        child: GridView.builder(
+          itemCount: projects.length,
+          itemBuilder: (context, i) => ProjectItem(
+            id: projects[i].id,
+            title: projects[i].title,
+          ),
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 3 / 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).pushNamed(ProjectFormScreen.route);
+        },
+      ),
+    );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
+import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:provider/provider.dart';
-import './../screens/task_form_screen.dart';
+import './../screens/taskFormScreen.dart';
 
 class TaskItem extends StatelessWidget {
   final String id;
@@ -37,7 +38,7 @@ class TaskItem extends StatelessWidget {
                     FlatButton(
                       child: Text('Yes'),
                       onPressed: () {
-                        Navigator.of(ctx).pop(false);
+                        Navigator.of(ctx).pop(true);
                       },
                     )
                   ],
@@ -56,7 +57,8 @@ class TaskItem extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(TaskFormScreen.route, arguments: id);
+          Navigator.of(context).pushNamed(TaskFormScreen.route,
+              arguments: {'taskId': id, 'projectId': null});
         },
         child: Card(
           shape:
@@ -67,9 +69,11 @@ class TaskItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.all(16),
+                height: MediaQuery.of(context).size.height * 0.07,
+                margin: EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
                       title,
@@ -79,6 +83,15 @@ class TaskItem extends StatelessWidget {
                     if (date != null)
                       Text(
                         DateFormat('dd/MM/yyyy').format(date),
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w200),
+                      ),
+                    if (projectId != null)
+                      Text(
+                        Provider.of<ProjectProvider>(context, listen: false)
+                            .findById(projectId)
+                            .title
+                            .toString(),
                         style: TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w200),
                       )
