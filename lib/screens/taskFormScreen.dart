@@ -100,13 +100,45 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         });
   }
 
+  Future<bool> _deleteDialog(BuildContext context, String taskId) {
+    return showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('Are you sure?'),
+              content: Text('Do you want to delete this task?'),
+              actions: <Widget>[
+                FlatButton(
+                    child: Text('No'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    }),
+                FlatButton(
+                  child: Text('yes'),
+                  onPressed: () {
+                    Provider.of<TaskProvider>(context, listen: false)
+                        .deleteTask(taskId);
+                    Navigator.of(ctx).pop();
+                    Navigator.of(ctx).pop();
+                  },
+                )
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          title:
-              Text(_editedTask.id == null ? 'Create new task' : 'Edit Task')),
+        title: Text(_editedTask.id == null ? 'Create new task' : 'Edit Task'),
+        actions: <Widget>[
+          if (_editedTask.id != null)
+            IconButton(
+              icon: const Icon(Icons.delete_rounded),
+              onPressed: () => _deleteDialog(context, _editedTask.id),
+            )
+        ],
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Container(

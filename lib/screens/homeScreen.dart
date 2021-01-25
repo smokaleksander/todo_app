@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pomodoro_app/screens/pomodoroTimer.dart';
 import 'package:pomodoro_app/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/models/task.dart';
@@ -19,12 +20,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<DateTime> _calendarDates;
+  List<Task> tasks = List<Task>();
   var _dayListItemSize = 45.0;
   int _daylistCurrIndex = 14;
   var _curDate = DateTime.now();
   var _showOnlyToDo = true;
   ScrollController _dayListScrollController;
   // generate 14 days before and after today
+
+  @override
+  void didChangeDependencies() {
+    final tasksData = Provider.of<TaskProvider>(context);
+    tasks = _showOnlyToDo
+        ? tasksData.findbyDateAndToDo(_calendarDates[_daylistCurrIndex])
+        : tasksData.findbyDateAndDone(_calendarDates[_daylistCurrIndex]);
+    super.didChangeDependencies();
+  }
 
   List<DateTime> generateCalendarDates() {
     List<DateTime> days = List<DateTime>();
@@ -79,45 +90,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var _dayListItemSize = 45.0;
-    final tasksData = Provider.of<TaskProvider>(context)
-        .findbyDate(_calendarDates[_daylistCurrIndex]);
-    final tasks =
-        _showOnlyToDo ? _filterTodo(tasksData) : _filterDone(tasksData);
+    // final tasksData = Provider.of<TaskProvider>(context)
+    //     .findbyDate(_calendarDates[_daylistCurrIndex]);
+    // final tasks =
+    //     _showOnlyToDo ? _filterTodo(tasksData) : _filterDone(tasksData);
+
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Hi, User'),
-      //   actions: <Widget>[
-      //     PopupMenuButton(
-      //       onSelected: (FilterOptions selectedValue) {
-      //         setState(() {
-      //           if (selectedValue == FilterOptions.ToDo) {
-      //             _showOnlyToDo = true;
-      //           } else {
-      //             _showOnlyToDo = false;
-      //           }
-      //         });
-      //       },
-      //       icon: Icon(
-      //         Icons.more_vert,
-      //       ),
-      //       itemBuilder: (_) => [
-      //         PopupMenuItem(
-      //           child: Text('Show to do'),
-      //           value: FilterOptions.ToDo,
-      //         ),
-      //         PopupMenuItem(
-      //           child: Text('Show done'),
-      //           value: FilterOptions.Done,
-      //         )
-      //       ],
-      //     )
-      //   ],
-      // ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          Navigator.of(context).pushNamed(TaskFormScreen.route,
-              arguments: {'taskId': null, 'projectId': null});
+          Navigator.of(context).pushNamed(PomodotoTimer.route);
+          // Navigator.of(context).pushNamed(TaskFormScreen.route,
+          //     arguments: {'taskId': null, 'projectId': null});
         },
       ),
       body: SafeArea(
@@ -239,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         if (selectedValue == FilterOptions.ToDo) {
                           _showOnlyToDo = true;
-                        } else {
+                        } else if (selectedValue == FilterOptions.Done) {
                           _showOnlyToDo = false;
                         }
                       });
@@ -268,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   0.82,
               child: (tasks.isEmpty && _showOnlyToDo)
                   ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(

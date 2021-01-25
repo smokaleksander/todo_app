@@ -26,14 +26,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: GridView.builder(
           itemCount: projects.length,
           itemBuilder: (context, i) => ProjectItem(
-            id: projects[i].id,
-            title: projects[i].title,
-          ),
+              id: projects[i].id,
+              title: projects[i].title,
+              allTasks: 10,
+              doneTasks: 5),
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
-            childAspectRatio: 3 / 2,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20,
+            childAspectRatio: 2.3 / 2.5,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
           ),
         ),
       ),

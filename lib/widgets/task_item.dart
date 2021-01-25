@@ -15,6 +15,11 @@ class TaskItem extends StatelessWidget {
   TaskItem({this.title, this.date, this.isDone, this.projectId, this.id});
 
   @override
+  void didChangeDependencies() {
+    //super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: ValueKey(id),

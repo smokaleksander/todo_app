@@ -83,6 +83,36 @@ class TaskProvider with ChangeNotifier {
     }
     return returnList;
   }
+
+  List<Task> findbyDateAndDone(DateTime date) {
+    List<Task> returnList = List<Task>();
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].date != null) {
+        if (_tasks[i].date.year == date.year &&
+            _tasks[i].date.month == date.month &&
+            _tasks[i].date.day == date.day &&
+            _tasks[i].isDone == true) {
+          returnList.add(_tasks[i]);
+        }
+      }
+    }
+    return returnList;
+  }
+
+  List<Task> findbyDateAndToDo(DateTime date) {
+    List<Task> returnList = List<Task>();
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].date != null) {
+        if (_tasks[i].date.year == date.year &&
+            _tasks[i].date.month == date.month &&
+            _tasks[i].date.day == date.day &&
+            _tasks[i].isDone == false) {
+          returnList.add(_tasks[i]);
+        }
+      }
+    }
+    return returnList;
+  }
   //getter for fetching copy of list of task
 
   void changeStatus(String id) {

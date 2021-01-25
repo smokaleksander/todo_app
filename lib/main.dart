@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/screens/StatisticsScreen.dart';
+import 'package:pomodoro_app/screens/pomodoroTimer.dart';
 import 'package:pomodoro_app/screens/profileScreen.dart';
 import 'package:pomodoro_app/screens/projectFormScreen.dart';
 import 'package:pomodoro_app/screens/taskFormScreen.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
           StatisticsScreen.route: (ctx) => StatisticsScreen(),
           TaskFormScreen.route: (ctx) => TaskFormScreen(),
           ProjectFormScreen.route: (ctx) => ProjectFormScreen(),
+          PomodotoTimer.route: (ctx) => PomodotoTimer(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

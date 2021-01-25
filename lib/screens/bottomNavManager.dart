@@ -41,6 +41,7 @@ class _BottomNavManagerState extends State<BottomNavManager> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

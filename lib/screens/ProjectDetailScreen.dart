@@ -100,7 +100,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   _showOnlyToDo = false;
                 } else if (selectedValue == _popUpMenuOptions.Edit) {
                   Navigator.of(context).pushNamed(
-                    TaskFormScreen.route,
+                    ProjectFormScreen.route,
                     arguments: project.id,
                   );
                 } else if (selectedValue == _popUpMenuOptions.Delete) {
