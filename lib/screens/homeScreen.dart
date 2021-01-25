@@ -68,11 +68,21 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  List<Task> _filterDone(List<Task> list) {
+    return list.where((ts) => ts.isDone == true).toList();
+  }
+
+  List<Task> _filterTodo(List<Task> list) {
+    return list.where((ts) => ts.isDone == false).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     var _dayListItemSize = 45.0;
-    final tasksData = Provider.of<TaskProvider>(context);
-    final tasks = _showOnlyToDo ? tasksData.toDoTasks : tasksData.doneTasks;
+    final tasksData = Provider.of<TaskProvider>(context)
+        .findbyDate(_calendarDates[_daylistCurrIndex]);
+    final tasks =
+        _showOnlyToDo ? _filterTodo(tasksData) : _filterDone(tasksData);
     return Scaffold(
       // appBar: AppBar(
       //   title: Text('Hi, User'),
@@ -205,6 +215,50 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 8,
                   );
                 },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: (MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.bottom -
+                        MediaQuery.of(context).padding.top) *
+                    0.02,
+              ),
+              height: (MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.bottom -
+                      MediaQuery.of(context).padding.top) *
+                  0.08,
+              child: Row(
+                children: [
+                  Text(
+                    'Your tasks',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                  ),
+                  PopupMenuButton(
+                    onSelected: (FilterOptions selectedValue) {
+                      setState(() {
+                        if (selectedValue == FilterOptions.ToDo) {
+                          _showOnlyToDo = true;
+                        } else {
+                          _showOnlyToDo = false;
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      Icons.more_vert,
+                    ),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        child: Text('Show to do'),
+                        value: FilterOptions.ToDo,
+                      ),
+                      PopupMenuItem(
+                        child: Text('Show done'),
+                        value: FilterOptions.Done,
+                      )
+                    ],
+                  )
+                ],
               ),
             ),
             Container(

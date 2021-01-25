@@ -66,24 +66,24 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
-  List<Task> get toDoTasks {
-    return _tasks.where((ts) => ts.isDone == false).toList();
-  }
-
-  List<Task> get doneTasks {
-    return _tasks.where((ts) => ts.isDone == true).toList();
-  }
-
   Task findById(id) {
     return _tasks.firstWhere((ts) => ts.id == id);
   }
 
-  List<Task> findbyDate() {}
-  //getter for fetching copy of list of task
-
-  List<Task> get tasks {
-    return [..._tasks]; //get copy of list intead of reference
+  List<Task> findbyDate(DateTime date) {
+    List<Task> returnList = List<Task>();
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].date != null) {
+        if (_tasks[i].date.year == date.year &&
+            _tasks[i].date.month == date.month &&
+            _tasks[i].date.day == date.day) {
+          returnList.add(_tasks[i]);
+        }
+      }
+    }
+    return returnList;
   }
+  //getter for fetching copy of list of task
 
   void changeStatus(String id) {
     (_tasks.firstWhere((ts) => ts.id == id)).toggleIsDone();
