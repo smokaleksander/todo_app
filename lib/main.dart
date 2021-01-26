@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/clock.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/screens/StatisticsScreen.dart';
@@ -25,6 +26,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => ProjectProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (ctx) => ClockProvider(),
+        )
       ],
       child: MaterialApp(
         theme: ThemeData(

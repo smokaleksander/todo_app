@@ -1,9 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/clock.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
-enum TimerStatus { none, running, paused, stopped }
+enum TimerStatus { running, paused, stopped }
 
 class PomodotoTimer extends StatefulWidget {
   static const route = '/timer';
@@ -14,65 +16,68 @@ class PomodotoTimer extends StatefulWidget {
 }
 
 class _PomodotoTimerState extends State<PomodotoTimer> {
-  int _seconds = 0;
-  int _minutes = 25;
-  Timer _timer;
+  //int _seconds = 0;
+  //int _minutes = 25;
+  // Timer _timer;
   var _timeFormatter = NumberFormat('00');
-  TimerStatus _timerStatus = TimerStatus.stopped;
+  //TimerStatus _timerStatus = TimerStatus.stopped;
 
-  void _startTimer() {
-    _timerStatus = TimerStatus.running;
-    if (_timer != null) {
-      //if timer is runnig
-      _timer.cancel();
-    }
-    // if (_minutes > 0) {
-    //   _seconds = (_minutes * 60) + _seconds;
-    // }
-    // if (_seconds > 60) {
-    //   _minutes = (_seconds / 60).floor();
-    //   _seconds -= (_minutes * 60);
-    // }
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_seconds > 0) {
-          _seconds--;
-        } else {
-          if (_minutes > 0) {
-            _seconds = 59;
-            _minutes--;
-          } else {
-            //timer finished
-            _timer.cancel();
-          }
-        }
-      });
-    });
-  }
+  // void _startTimer() {
+  //   _timerStatus = TimerStatus.running;
+  //   if (_timer != null) {
+  //     //if timer is runnig
+  //     _timer.cancel();
+  //   }
+  //   // if (_minutes > 0) {
+  //   //   _seconds = (_minutes * 60) + _seconds;
+  //   // }
+  //   // if (_seconds > 60) {
+  //   //   _minutes = (_seconds / 60).floor();
+  //   //   _seconds -= (_minutes * 60);
+  //   // }
+  //   _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //     setState(() {
+  //       if (_seconds > 0) {
+  //         _seconds--;
+  //       } else {
+  //         if (_minutes > 0) {
+  //           _seconds = 59;
+  //           _minutes--;
+  //         } else {
+  //           //timer finished
+  //           _timer.cancel();
+  //         }
+  //       }
+  //     });
+  //   });
+  // }
 
-  void _stopTimer() {
-    _timerStatus = TimerStatus.stopped;
-    _timer.cancel();
-    _seconds = 0;
-    _minutes = 25;
-    setState(() {});
-  }
+  // void _stopTimer() {
+  //   _timerStatus = TimerStatus.stopped;
+  //   _timer.cancel();
+  //   _seconds = 0;
+  //   _minutes = 25;
+  //   setState(() {});
+  // }
 
-  void _pauseTimer() {
-    _timerStatus = TimerStatus.paused;
-    _timer.cancel();
-    setState(() {});
-  }
+  // void _pauseTimer() {
+  //   _timerStatus = TimerStatus.paused;
+  //   _timer.cancel();
+  //   setState(() {});
+  // }
 
-  void _continueTimer() {
-    _minutes = _minutes;
-    _seconds = _seconds;
-    _startTimer();
-    setState(() {});
-  }
+  // void _continueTimer() {
+  //   _minutes = _minutes;
+  //   _seconds = _seconds;
+  //   _startTimer();
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final clockProvider = Provider.of<ClockProvider>(context);
+    final clock = clockProvider.getClock;
+    print('timer rebuild');
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -91,11 +96,12 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
               ],
             ),
             Container(
-                child: Text(
-              '${_timeFormatter.format(_minutes)}:${_timeFormatter.format(_seconds)}',
-              style: TextStyle(fontSize: 50),
-            )),
-            if (_timerStatus == TimerStatus.stopped)
+              child: Text(
+                '${_timeFormatter.format(clock.minutes)}:${_timeFormatter.format(clock.seconds)}',
+                style: TextStyle(fontSize: 50),
+              ),
+            ),
+            if (clock.timerStatus.index == TimerStatus.stopped.index)
               Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -117,14 +123,16 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
                             style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.w500),
                           ),
-                          onPressed: () => _startTimer(),
+                          onPressed: () =>
+                              Provider.of<ClockProvider>(context, listen: false)
+                                  .startTimer(),
                         ),
                       ),
                     )
                   ],
                 ),
               ),
-            if (_timerStatus == TimerStatus.running)
+            if (clock.timerStatus.index == TimerStatus.running.index)
               Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -146,14 +154,16 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
                             style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.w500),
                           ),
-                          onPressed: () => _pauseTimer(),
+                          onPressed: () =>
+                              Provider.of<ClockProvider>(context, listen: false)
+                                  .pauseTimer(),
                         ),
                       ),
                     )
                   ],
                 ),
               ),
-            if (_timerStatus == TimerStatus.paused)
+            if (clock.timerStatus.index == TimerStatus.paused.index)
               Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -175,7 +185,9 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.w500),
                           ),
-                          onPressed: () => _continueTimer(),
+                          onPressed: () =>
+                              Provider.of<ClockProvider>(context, listen: false)
+                                  .continueTimer(),
                         ),
                       ),
                     ),
@@ -197,7 +209,9 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.w500),
                           ),
-                          onPressed: () => _stopTimer(),
+                          onPressed: () =>
+                              Provider.of<ClockProvider>(context, listen: false)
+                                  .stopTimer(),
                         ),
                       ),
                     )
