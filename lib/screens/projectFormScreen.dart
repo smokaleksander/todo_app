@@ -147,19 +147,18 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                     },
                   ),
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.08,
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      textColor: Theme.of(context).primaryColor,
-                      child: Text(_editedProject.id == null
-                          ? 'Create new Project'
-                          : 'Edit Project'),
-                      onPressed: _projectFormSubmit,
-                    ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  child: RaisedButton(
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(25)),
+                    color: Theme.of(context).accentColor,
+                    textColor: Theme.of(context).primaryColor,
+                    child: Text(_editedProject.id == null
+                        ? 'Create new Project'
+                        : 'Edit Project'),
+                    onPressed: _projectFormSubmit,
                   ),
                 )
               ],

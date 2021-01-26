@@ -283,19 +283,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     ),
                   ),
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.08,
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      textColor: Theme.of(context).primaryColor,
-                      child: Text(
-                        _editedTask.id == null ? 'Create task' : 'Save task',
-                      ),
-                      onPressed: _taskFormSubmit,
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  child: RaisedButton(
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(25)),
+                    color: Theme.of(context).accentColor,
+                    textColor: Theme.of(context).primaryColor,
+                    child: Text(
+                      _editedTask.id == null ? 'Create task' : 'Save task',
                     ),
+                    onPressed: _taskFormSubmit,
                   ),
                 )
               ],
