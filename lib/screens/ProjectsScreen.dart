@@ -20,6 +20,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Projects'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add_rounded,
+            ),
+            iconSize: 32,
+            color: Theme.of(context).accentColor,
+            onPressed: () =>
+                Navigator.of(context).pushNamed(ProjectFormScreen.route),
+          )
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(8),

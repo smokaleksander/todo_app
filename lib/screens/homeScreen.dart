@@ -158,7 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: _calendarDates.length,
                     itemBuilder: (BuildContext context, int i) {
                       return Container(
-                        //margin: EdgeInsets.only(top: 16, bottom: 8),
                         width: _dayListItemSize,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -253,8 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       IconButton(
                         icon: Icon(
                           Icons.add_rounded,
-                          size: 35,
                         ),
+                        iconSize: 32,
                         color: Theme.of(context).accentColor,
                         onPressed: () {},
                       )

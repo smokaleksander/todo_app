@@ -58,7 +58,7 @@ class TaskItem extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(PomodotoTimer.route);
+          Navigator.of(context).pushNamed(PomodoroTimer.route, arguments: id);
         },
         onLongPress: () {
           Navigator.of(context).pushNamed(TaskFormScreen.route,
@@ -82,7 +82,7 @@ class TaskItem extends StatelessWidget {
                     Text(
                       title,
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     if (date != null)
                       Text(

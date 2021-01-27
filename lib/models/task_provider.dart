@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pomodoro_app/models/project.dart';
 import './task.dart';
 
 class TaskProvider with ChangeNotifier {

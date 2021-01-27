@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/clock.dart';
+import 'package:pomodoro_app/models/pomodoroProvider.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/screens/StatisticsScreen.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => ClockProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => PomodoroProvider(),
         )
       ],
       child: MaterialApp(
@@ -46,7 +50,7 @@ class MyApp extends StatelessWidget {
           StatisticsScreen.route: (ctx) => StatisticsScreen(),
           TaskFormScreen.route: (ctx) => TaskFormScreen(),
           ProjectFormScreen.route: (ctx) => ProjectFormScreen(),
-          PomodotoTimer.route: (ctx) => PomodotoTimer(),
+          PomodoroTimer.route: (ctx) => PomodoroTimer(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

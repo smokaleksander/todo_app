@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class Task with ChangeNotifier {
   final String id;
   final String title;
   final DateTime date;
   final String projectId;
+  DateTime doneDate;
   bool isDone;
 
   Task({
@@ -13,10 +15,18 @@ class Task with ChangeNotifier {
     this.date,
     this.projectId,
     this.isDone = false,
+    this.doneDate,
   });
 
   void toggleIsDone() {
-    isDone = !isDone;
+    if (isDone == false) {
+      isDone = !isDone;
+      doneDate = DateTime.now();
+    } else {
+      isDone = !isDone;
+      doneDate = null;
+    }
+
     notifyListeners();
   }
 }

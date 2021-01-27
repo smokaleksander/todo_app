@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/pomodoro.dart';
 import 'dart:async';
-import 'dart:math';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:pomodoro_app/models/pomodoroProvider.dart';
 
 enum TimerStatus { running, paused, stopped }
 
 class Clock {
-  int pomodoroLength = 25;
+  int pomodoroLength = 1;
   int breakLength = 5;
   int seconds = 0;
   int minutes = 0;
   bool isBreakTime = false;
   Timer timer;
   TimerStatus timerStatus = TimerStatus.stopped;
-
+  String taskId;
+  BuildContext context;
   Clock() {
     minutes = pomodoroLength;
+  }
+
+  void savePomodoro() {
+    Pomodoro newPomo = Pomodoro(
+        id: DateTime.now().toString(),
+        finishedDate: DateTime.now(),
+        taskId: taskId,
+        length: Duration(
+            seconds: (pomodoroLength * 60) - (minutes * 60) - seconds));
+    print(newPomo.taskId);
+    print(newPomo.length);
+    Provider.of<PomodoroProvider>(context, listen: false).addPomodoro(newPomo);
   }
 }
 
 class ClockProvider with ChangeNotifier {
   Clock clock = Clock();
-  var _timeFormatter = NumberFormat('00');
 
   Clock get getClock {
     return clock;
@@ -54,6 +67,8 @@ class ClockProvider with ChangeNotifier {
         } else {
           //timer finished
           clock.timer.cancel();
+          //create and save pomodoro
+          clock.savePomodoro();
           //start a break
           clock.minutes = clock.breakLength;
           clock.isBreakTime = !clock.isBreakTime;
@@ -68,7 +83,7 @@ class ClockProvider with ChangeNotifier {
     clock.timerStatus = TimerStatus.stopped;
     clock.timer.cancel();
     clock.seconds = 0;
-    clock.minutes = 25;
+    clock.minutes = clock.pomodoroLength;
     notifyListeners();
   }
 
@@ -83,5 +98,12 @@ class ClockProvider with ChangeNotifier {
     clock.seconds = clock.seconds;
     startTimer();
     notifyListeners();
+  }
+
+  void skipBreak() {
+    clock.isBreakTime = !clock.isBreakTime;
+    clock.seconds = 0;
+    clock.minutes = clock.pomodoroLength;
+    startTimer();
   }
 }

@@ -39,7 +39,7 @@ class _BottomNavManagerState extends State<BottomNavManager> {
         ),
         elevation: 5.0,
         onPressed: () {
-          Navigator.of(context).pushNamed(PomodotoTimer.route);
+          Navigator.of(context).pushNamed(PomodoroTimer.route);
           // Navigator.of(context).pushNamed(TaskFormScreen.route,
           //     arguments: {'taskId': null, 'projectId': null});
         },
