@@ -96,14 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
     //     _showOnlyToDo ? _filterTodo(tasksData) : _filterDone(tasksData);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).pushNamed(PomodotoTimer.route);
-          // Navigator.of(context).pushNamed(TaskFormScreen.route,
-          //     arguments: {'taskId': null, 'projectId': null});
-        },
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
@@ -121,9 +113,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   0.08,
               child: Row(
                 children: [
-                  Text(
-                    DateFormat("MMMMEEEEd").format(DateTime.now()).toString(),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  Expanded(
+                    child: Text(
+                      DateFormat("EEEE, MMM d")
+                          .format(DateTime.now())
+                          .toString(),
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                    ),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_rounded),
@@ -136,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       _nextDay(_dayListItemSize);
                     },
-                  )
+                  ),
                 ],
               ),
             ),

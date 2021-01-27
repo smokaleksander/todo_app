@@ -6,10 +6,17 @@ import 'package:intl/intl.dart';
 enum TimerStatus { running, paused, stopped }
 
 class Clock {
+  int pomodoroLength = 25;
+  int breakLength = 5;
   int seconds = 0;
-  int minutes = 25;
+  int minutes = 0;
+  bool isBreakTime = false;
   Timer timer;
   TimerStatus timerStatus = TimerStatus.stopped;
+
+  Clock() {
+    minutes = pomodoroLength;
+  }
 }
 
 class ClockProvider with ChangeNotifier {
@@ -21,6 +28,9 @@ class ClockProvider with ChangeNotifier {
   }
 
   void startTimer() {
+    if (clock.timerStatus != TimerStatus.paused && clock.isBreakTime == false) {
+      clock.minutes = clock.pomodoroLength;
+    }
     clock.timerStatus = TimerStatus.running;
     if (clock.timer != null) {
       //if timer is runnig
@@ -33,6 +43,7 @@ class ClockProvider with ChangeNotifier {
     //   _minutes = (_seconds / 60).floor();
     //   _seconds -= (_minutes * 60);
     // }
+
     clock.timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (clock.seconds > 0) {
         clock.seconds--;
@@ -43,6 +54,10 @@ class ClockProvider with ChangeNotifier {
         } else {
           //timer finished
           clock.timer.cancel();
+          //start a break
+          clock.minutes = clock.breakLength;
+          clock.isBreakTime = !clock.isBreakTime;
+          startTimer();
         }
       }
       notifyListeners();

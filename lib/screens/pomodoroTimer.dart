@@ -9,75 +9,43 @@ enum TimerStatus { running, paused, stopped }
 
 class PomodotoTimer extends StatefulWidget {
   static const route = '/timer';
-  double _seconds = 0;
-  double _minutes = 25;
   @override
   _PomodotoTimerState createState() => _PomodotoTimerState();
 }
 
 class _PomodotoTimerState extends State<PomodotoTimer> {
-  //int _seconds = 0;
-  //int _minutes = 25;
-  // Timer _timer;
   var _timeFormatter = NumberFormat('00');
-  //TimerStatus _timerStatus = TimerStatus.stopped;
-
-  // void _startTimer() {
-  //   _timerStatus = TimerStatus.running;
-  //   if (_timer != null) {
-  //     //if timer is runnig
-  //     _timer.cancel();
-  //   }
-  //   // if (_minutes > 0) {
-  //   //   _seconds = (_minutes * 60) + _seconds;
-  //   // }
-  //   // if (_seconds > 60) {
-  //   //   _minutes = (_seconds / 60).floor();
-  //   //   _seconds -= (_minutes * 60);
-  //   // }
-  //   _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-  //     setState(() {
-  //       if (_seconds > 0) {
-  //         _seconds--;
-  //       } else {
-  //         if (_minutes > 0) {
-  //           _seconds = 59;
-  //           _minutes--;
-  //         } else {
-  //           //timer finished
-  //           _timer.cancel();
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
-
-  // void _stopTimer() {
-  //   _timerStatus = TimerStatus.stopped;
-  //   _timer.cancel();
-  //   _seconds = 0;
-  //   _minutes = 25;
-  //   setState(() {});
-  // }
-
-  // void _pauseTimer() {
-  //   _timerStatus = TimerStatus.paused;
-  //   _timer.cancel();
-  //   setState(() {});
-  // }
-
-  // void _continueTimer() {
-  //   _minutes = _minutes;
-  //   _seconds = _seconds;
-  //   _startTimer();
-  //   setState(() {});
-  // }
+  Future<bool> _stopDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('Stop this pomodoro?'),
+              content: Text('Do you want to stop and save this pomodoro?'),
+              actions: <Widget>[
+                FlatButton(
+                    child: Text('Stop and discard'),
+                    onPressed: () {
+                      Provider.of<ClockProvider>(context, listen: false)
+                          .stopTimer();
+                      Navigator.of(ctx).pop();
+                    }),
+                FlatButton(
+                  child: Text('Stop and save'),
+                  onPressed: () {
+                    Provider.of<ClockProvider>(context, listen: false)
+                        .stopTimer();
+                    //save this pomodoro
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+              ],
+            ));
+  }
 
   @override
   Widget build(BuildContext context) {
     final clockProvider = Provider.of<ClockProvider>(context);
     final clock = clockProvider.getClock;
-    print('timer rebuild');
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -192,29 +160,26 @@ class _PomodotoTimerState extends State<PomodotoTimer> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: MediaQuery.of(context).size.height * 0.08,
-                      ),
-                      height: MediaQuery.of(context).size.height * 0.07,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: OutlineButton(
-                          textColor: Theme.of(context).accentColor,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(25)),
-                          borderSide: BorderSide(
-                              color: Theme.of(context).accentColor, width: 4),
-                          child: Text(
-                            'Stop',
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.w500),
-                          ),
-                          onPressed: () =>
-                              Provider.of<ClockProvider>(context, listen: false)
-                                  .stopTimer(),
+                        margin: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.height * 0.08,
                         ),
-                      ),
-                    )
+                        height: MediaQuery.of(context).size.height * 0.07,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: OutlineButton(
+                            textColor: Theme.of(context).accentColor,
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(25)),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor, width: 4),
+                            child: Text(
+                              'Stop',
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.w500),
+                            ),
+                            onPressed: () => _stopDialog(context),
+                          ),
+                        ))
                   ],
                 ),
               ),
