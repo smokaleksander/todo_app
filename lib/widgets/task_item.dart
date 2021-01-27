@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
+import 'package:pomodoro_app/screens/pomodoroTimer.dart';
 import 'package:provider/provider.dart';
 import './../screens/taskFormScreen.dart';
 
@@ -57,6 +58,9 @@ class TaskItem extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
+          Navigator.of(context).pushNamed(PomodotoTimer.route);
+        },
+        onLongPress: () {
           Navigator.of(context).pushNamed(TaskFormScreen.route,
               arguments: {'taskId': id, 'projectId': null});
         },

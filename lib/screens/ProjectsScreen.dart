@@ -38,12 +38,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).pushNamed(ProjectFormScreen.route);
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: Icon(Icons.add),
+      //   onPressed: () {
+      //     Navigator.of(context).pushNamed(ProjectFormScreen.route);
+      //   },
+      // ),
     );
   }
 }

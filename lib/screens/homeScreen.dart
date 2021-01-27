@@ -98,182 +98,201 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
-              Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: (MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.bottom -
-                        MediaQuery.of(context).padding.top) *
-                    0.02,
-              ),
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.bottom -
-                      MediaQuery.of(context).padding.top) *
-                  0.08,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      DateFormat("EEEE, MMM d")
-                          .format(DateTime.now())
-                          .toString(),
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                    ),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: (MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.bottom -
+                            MediaQuery.of(context).padding.top) *
+                        0.02,
                   ),
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_rounded),
-                    onPressed: () {
-                      _prevDay(_dayListItemSize);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.arrow_forward_ios_rounded),
-                    onPressed: () {
-                      _nextDay(_dayListItemSize);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                bottom: (MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.bottom -
-                        MediaQuery.of(context).padding.top) *
-                    0.01,
-              ),
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.bottom -
-                      MediaQuery.of(context).padding.top) *
-                  0.08,
-              child: ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _dayListScrollController,
-                scrollDirection: Axis.horizontal,
-                itemCount: _calendarDates.length,
-                itemBuilder: (BuildContext context, int i) {
-                  return Container(
-                    //margin: EdgeInsets.only(top: 16, bottom: 8),
-                    width: _dayListItemSize,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: (i != _daylistCurrIndex)
-                            ? Theme.of(context).primaryColor
-                            : Theme.of(context).accentColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text(DateFormat('d').format(_calendarDates[i]),
-                            style: TextStyle(
-                                color: (i != _daylistCurrIndex)
-                                    ? Theme.of(context).accentColor
-                                    : Theme.of(context).primaryColor,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600)),
-                        Text(DateFormat('MMMM').format(_calendarDates[i]),
-                            style: TextStyle(
-                                color: (i != _daylistCurrIndex)
-                                    ? Theme.of(context).accentColor
-                                    : Theme.of(context).primaryColor,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w400)),
-                        Text(DateFormat('EEE').format(_calendarDates[i]),
-                            style: TextStyle(
-                                color: (i != _daylistCurrIndex)
-                                    ? Theme.of(context).accentColor
-                                    : Theme.of(context).primaryColor,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600))
-                      ],
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int i) {
-                  return SizedBox(
-                    width: 8,
-                  );
-                },
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: (MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.bottom -
-                        MediaQuery.of(context).padding.top) *
-                    0.02,
-              ),
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.bottom -
-                      MediaQuery.of(context).padding.top) *
-                  0.08,
-              child: Row(
-                children: [
-                  Text(
-                    'Your tasks',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-                  ),
-                  PopupMenuButton(
-                    onSelected: (FilterOptions selectedValue) {
-                      setState(() {
-                        if (selectedValue == FilterOptions.ToDo) {
-                          _showOnlyToDo = true;
-                        } else if (selectedValue == FilterOptions.Done) {
-                          _showOnlyToDo = false;
-                        }
-                      });
-                    },
-                    icon: Icon(
-                      Icons.more_vert,
-                    ),
-                    itemBuilder: (_) => [
-                      PopupMenuItem(
-                        child: Text('Show to do'),
-                        value: FilterOptions.ToDo,
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.bottom -
+                          MediaQuery.of(context).padding.top) *
+                      0.08,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          DateFormat("EEEE, MMM d")
+                              .format(DateTime.now())
+                              .toString(),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w500),
+                        ),
                       ),
-                      PopupMenuItem(
-                        child: Text('Show done'),
-                        value: FilterOptions.Done,
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios_rounded),
+                        color: Theme.of(context).accentColor,
+                        onPressed: () {
+                          _prevDay(_dayListItemSize);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.arrow_forward_ios_rounded),
+                        color: Theme.of(context).accentColor,
+                        onPressed: () {
+                          _nextDay(_dayListItemSize);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    bottom: (MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.bottom -
+                            MediaQuery.of(context).padding.top) *
+                        0.01,
+                  ),
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.bottom -
+                          MediaQuery.of(context).padding.top) *
+                      0.08,
+                  child: ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _dayListScrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _calendarDates.length,
+                    itemBuilder: (BuildContext context, int i) {
+                      return Container(
+                        //margin: EdgeInsets.only(top: 16, bottom: 8),
+                        width: _dayListItemSize,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: (i != _daylistCurrIndex)
+                                ? Theme.of(context).primaryColor
+                                : Theme.of(context).accentColor),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Text(DateFormat('d').format(_calendarDates[i]),
+                                style: TextStyle(
+                                    color: (i != _daylistCurrIndex)
+                                        ? Theme.of(context).accentColor
+                                        : Theme.of(context).primaryColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600)),
+                            Text(DateFormat('MMMM').format(_calendarDates[i]),
+                                style: TextStyle(
+                                    color: (i != _daylistCurrIndex)
+                                        ? Theme.of(context).accentColor
+                                        : Theme.of(context).primaryColor,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w400)),
+                            Text(DateFormat('EEE').format(_calendarDates[i]),
+                                style: TextStyle(
+                                    color: (i != _daylistCurrIndex)
+                                        ? Theme.of(context).accentColor
+                                        : Theme.of(context).primaryColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600))
+                          ],
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int i) {
+                      return SizedBox(
+                        width: 8,
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: (MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.bottom -
+                            MediaQuery.of(context).padding.top) *
+                        0.02,
+                  ),
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.bottom -
+                          MediaQuery.of(context).padding.top) *
+                      0.08,
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Row(
+                        children: [
+                          Text(
+                            'Your tasks',
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w500),
+                          ),
+                          PopupMenuButton(
+                            onSelected: (FilterOptions selectedValue) {
+                              setState(() {
+                                if (selectedValue == FilterOptions.ToDo) {
+                                  _showOnlyToDo = true;
+                                } else if (selectedValue ==
+                                    FilterOptions.Done) {
+                                  _showOnlyToDo = false;
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                child: Text('Show to do'),
+                                value: FilterOptions.ToDo,
+                              ),
+                              PopupMenuItem(
+                                child: Text('Show done'),
+                                value: FilterOptions.Done,
+                              )
+                            ],
+                          ),
+                        ],
+                      )),
+                      IconButton(
+                        icon: Icon(
+                          Icons.add_rounded,
+                          size: 35,
+                        ),
+                        color: Theme.of(context).accentColor,
+                        onPressed: () {},
                       )
                     ],
-                  )
-                ],
-              ),
-            ),
-            Container(
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.bottom -
-                      MediaQuery.of(context).padding.top) *
-                  0.82,
-              child: (tasks.isEmpty && _showOnlyToDo)
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(left: 25),
-                          child: Image.asset(
-                            'assets/images/no_tasks.png',
-                            fit: BoxFit.cover,
+                  ),
+                ),
+                Container(
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.bottom -
+                          MediaQuery.of(context).padding.top) *
+                      0.82,
+                  child: (tasks.isEmpty && _showOnlyToDo)
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(left: 25),
+                              child: Image.asset(
+                                'assets/images/no_tasks.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Text('You have no tasks for today'),
+                          ],
+                        )
+                      : ListView.builder(
+                          itemCount: tasks.length,
+                          itemBuilder: (context, i) => TaskItem(
+                            id: tasks[i].id,
+                            title: tasks[i].title,
+                            date: tasks[i].date,
+                            projectId: tasks[i].projectId,
+                            isDone: tasks[i].isDone,
                           ),
                         ),
-                        Text('You have no tasks for today'),
-                      ],
-                    )
-                  : ListView.builder(
-                      itemCount: tasks.length,
-                      itemBuilder: (context, i) => TaskItem(
-                        id: tasks[i].id,
-                        title: tasks[i].title,
-                        date: tasks[i].date,
-                        projectId: tasks[i].projectId,
-                        isDone: tasks[i].isDone,
-                      ),
-                    ),
-            ),
-          ]),
+                ),
+              ]),
         ),
       ),
     );
