@@ -13,12 +13,19 @@ class PomodoroProvider with ChangeNotifier {
         length: passedPomo.length);
 
     _pomodoros.add(newPom);
-    for (int i = 0; i < _pomodoros.length; i++) {
-      print(_pomodoros[i].id);
-      print(_pomodoros[i].finishedDate);
-      print(_pomodoros[i].taskId);
-      print(_pomodoros[i].length);
-    }
     notifyListeners();
+  }
+
+  //return pomodoro numbers and all duration
+  Map getStatsForTask(String taskId) {
+    int pomoNum = 0;
+    Duration length = Duration(seconds: 0);
+    for (int i = 0; i < _pomodoros.length; i++) {
+      if (_pomodoros[i].taskId == taskId) {
+        pomoNum++;
+        length = length + _pomodoros[i].length;
+      }
+    }
+    return {'pomoNum': pomoNum, 'length': length};
   }
 }

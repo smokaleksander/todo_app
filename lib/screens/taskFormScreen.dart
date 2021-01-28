@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/pomodoroProvider.dart';
 import 'package:pomodoro_app/models/project.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import './../widgets/date_dialog.dart';
@@ -8,6 +9,7 @@ import 'package:pomodoro_app/models/task_provider.dart';
 import './../models/task.dart';
 import './../models/task_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:duration/duration.dart';
 
 class TaskFormScreen extends StatefulWidget {
   static const route = '/task-form';
@@ -16,7 +18,9 @@ class TaskFormScreen extends StatefulWidget {
 }
 
 class _TaskFormScreenState extends State<TaskFormScreen> {
+  //bool for auto setting project if adding inside project
   bool _isProjectScoped = false;
+  //
   String _titleInitialValue;
   final _dateFieldController = TextEditingController()..text = 'No duedate';
   final _projectFieldController = TextEditingController()..text = 'No project';
@@ -25,6 +29,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   var _choosenProject = Project(id: null, title: null);
   var _editedTask =
       Task(id: null, title: '', date: null, isDone: false, projectId: null);
+  String _pomodoroNumber = '0';
+  String _allPomodoroDuration = '0';
   //var for loading task when in editing mode
   var _isInit = true;
   //check if argument passed in route wchich means editting mode
@@ -38,6 +44,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         _editedTask =
             Provider.of<TaskProvider>(context, listen: false).findById(taskId);
         _titleInitialValue = _editedTask.title;
+        final stats = Provider.of<PomodoroProvider>(context, listen: false)
+            .getStatsForTask(taskId);
+        _pomodoroNumber = stats['pomoNum'].toString();
+        _allPomodoroDuration = printDuration(stats['length'],
+            abbreviated: true, tersity: DurationTersity.minute);
         if (_editedTask.date != null) {
           _dateFieldController.text =
               DateFormat('dd/MM/yyyy').format(_editedTask.date).toString();
@@ -128,9 +139,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(_editedTask.id == null ? 'Create new task' : 'Edit Task'),
+        elevation: 0,
+        title:
+            Text(_editedTask.id == null ? 'Create new task' : 'Task details'),
         actions: <Widget>[
           if (_editedTask.id != null)
             IconButton(
@@ -283,7 +296,51 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     ),
                   ),
                 ),
+                if (_editedTask.id != null)
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 4.0),
+                              child: Icon(
+                                Icons.timer_rounded,
+                              ),
+                            ),
+                            Text(
+                              'Pomodoro numbers',
+                              style: TextStyle(fontSize: 16),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  _pomodoroNumber,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Icon(
+                                  Icons.timer_rounded,
+                                  size: 16,
+                                )
+                              ],
+                            ),
+                            if (_pomodoroNumber != '0')
+                              Text(_allPomodoroDuration)
+                          ],
+                        ),
+                      ),
+                    ],
+                  )),
                 Container(
+                  margin: EdgeInsets.only(top: 25, bottom: 10),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.08,
                   child: RaisedButton(

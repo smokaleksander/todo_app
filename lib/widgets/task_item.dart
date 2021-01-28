@@ -57,10 +57,10 @@ class TaskItem extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(8, 8, 8, 0),
       ),
       child: InkWell(
-        onTap: () {
+        onLongPress: () {
           Navigator.of(context).pushNamed(PomodoroTimer.route, arguments: id);
         },
-        onLongPress: () {
+        onTap: () {
           Navigator.of(context).pushNamed(TaskFormScreen.route,
               arguments: {'taskId': id, 'projectId': null});
         },

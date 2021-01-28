@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  duration:
+    dependency: "direct dev"
+    description:
+      name: duration
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.15"
   fake_async:
     dependency: transitive
     description:
@@ -102,13 +109,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0-nullsafety.1"
-  persistent_bottom_nav_bar:
-    dependency: "direct dev"
-    description:
-      name: persistent_bottom_nav_bar
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
   provider:
     dependency: "direct dev"
     description:

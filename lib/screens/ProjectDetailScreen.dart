@@ -89,6 +89,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         : tasksData.doneInProject(passedProjectId);
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text(project.title),
         actions: <Widget>[
           PopupMenuButton(

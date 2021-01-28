@@ -19,6 +19,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final projects = projectsData.projects;
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text('Your Projects'),
         actions: [
           IconButton(

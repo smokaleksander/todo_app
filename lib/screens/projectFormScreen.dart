@@ -105,6 +105,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
         title: Text(
             _editedProject.id == null ? 'Create new Project' : 'Edit Project'),
         actions: [

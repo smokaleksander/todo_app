@@ -7,7 +7,7 @@ import 'package:pomodoro_app/models/pomodoroProvider.dart';
 enum TimerStatus { running, paused, stopped }
 
 class Clock {
-  int pomodoroLength = 1;
+  int pomodoroLength = 25;
   int breakLength = 5;
   int seconds = 0;
   int minutes = 0;

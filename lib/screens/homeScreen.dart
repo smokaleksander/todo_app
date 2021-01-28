@@ -255,7 +255,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         iconSize: 32,
                         color: Theme.of(context).accentColor,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(TaskFormScreen.route,
+                              arguments: {'taskId': null, 'projectId': null});
+                        },
                       )
                     ],
                   ),
