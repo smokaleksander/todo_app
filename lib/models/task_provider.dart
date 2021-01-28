@@ -112,7 +112,20 @@ class TaskProvider with ChangeNotifier {
     }
     return returnList;
   }
-  //getter for fetching copy of list of task
+
+  double getProjectProgress(String projectId) {
+    double done = 0;
+    double todo = 0;
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].projectId == projectId) {
+        todo++;
+        if (_tasks[i].isDone == true) {
+          done++;
+        }
+      }
+    }
+    return (done / todo * 100);
+  }
 
   void changeStatus(String id) {
     (_tasks.firstWhere((ts) => ts.id == id)).toggleIsDone();

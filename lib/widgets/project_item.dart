@@ -1,6 +1,7 @@
 //import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:pomodoro_app/models/task_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:pomodoro_app/screens/ProjectDetailScreen.dart';
 import './../screens/projectFormScreen.dart';
 import './circleProgress.dart';
@@ -21,7 +22,8 @@ class ProjectItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double _currProgress = (doneTasks / allTasks * 100);
+    double _currProgress =
+        Provider.of<TaskProvider>(context).getProjectProgress(id);
     return InkWell(
       onLongPress: () => Navigator.of(context)
           .pushNamed(ProjectFormScreen.route, arguments: id),
@@ -44,7 +46,7 @@ class ProjectItem extends StatelessWidget {
                     margin: EdgeInsets.symmetric(vertical: 16),
                     width: MediaQuery.of(context).size.height * 0.15,
                     height: MediaQuery.of(context).size.height * 0.15,
-                    child: Center(child: Text('${_currProgress}%')),
+                    child: Center(child: Text('${_currProgress.round()}%')),
                   ),
                 ),
               ),
