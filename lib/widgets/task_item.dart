@@ -11,7 +11,7 @@ class TaskItem extends StatelessWidget {
   final String title;
   final DateTime date;
   final bool isDone;
-  String projectId;
+  final String projectId;
 
   TaskItem({this.title, this.date, this.isDone, this.projectId, this.id});
 

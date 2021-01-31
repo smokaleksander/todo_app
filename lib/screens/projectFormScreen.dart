@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/project.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
-import 'package:pomodoro_app/models/task.dart';
-import 'package:pomodoro_app/screens/ProjectsScreen.dart';
-import './../widgets/date_dialog.dart';
-import './../widgets/project_dialog.dart';
+
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
 import './../models/project.dart';
 import './../models/task_provider.dart';
-import 'package:intl/intl.dart';
 
 class ProjectFormScreen extends StatefulWidget {
   static const route = '/project-form';

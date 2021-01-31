@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/models/clock.dart';
 import 'package:pomodoro_app/models/project_provider.dart';

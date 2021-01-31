@@ -154,14 +154,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       ),
       body: Column(
         children: <Widget>[
-          Card(
-            margin: EdgeInsets.all(15),
-            child: Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('project description'),
-            ),
-          ),
-          SizedBox(height: 10),
+          // Card(
+          //   margin: EdgeInsets.all(15),
+          //   child: Padding(
+          //     padding: EdgeInsets.all(8),
+          //     child: Text('project description'),
+          //   ),
+          // ),
           Expanded(
             child: ListView.builder(
               itemCount: tasks.length,

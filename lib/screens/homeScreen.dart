@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pomodoro_app/screens/pomodoroTimer.dart';
+
 import 'package:pomodoro_app/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:pomodoro_app/models/task.dart';
@@ -23,17 +23,32 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Task> tasks = List<Task>();
   var _dayListItemSize = 45.0;
   int _daylistCurrIndex = 14;
-  var _curDate = DateTime.now();
+  //var _curDate = DateTime.now();
   var _showOnlyToDo = true;
   ScrollController _dayListScrollController;
+  var _isInit = true;
+  var _isLoading = false;
   // generate 14 days before and after today
 
   @override
   void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      print('fetching');
+      Provider.of<TaskProvider>(context).fetchTasks().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+      _isInit = false;
+    }
     final tasksData = Provider.of<TaskProvider>(context);
-    tasks = _showOnlyToDo
-        ? tasksData.findbyDateAndToDo(_calendarDates[_daylistCurrIndex])
-        : tasksData.findbyDateAndDone(_calendarDates[_daylistCurrIndex]);
+    tasks = tasksData.tasks;
+    // tasks = _showOnlyToDo
+    //     ? tasksData.findbyDateAndToDo(_calendarDates[_daylistCurrIndex])
+    //     : tasksData.findbyDateAndDone(_calendarDates[_daylistCurrIndex]);
     super.didChangeDependencies();
   }
 
@@ -61,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _dayListScrollController.animateTo(
           _dayListScrollController.offset + itemSize + 8,
           curve: Curves.linear,
-          duration: Duration(milliseconds: 300));
+          duration: Duration(milliseconds: 200));
       _daylistCurrIndex++;
     });
   }
@@ -72,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _dayListScrollController.animateTo(
           _dayListScrollController.offset - itemSize - 8,
           curve: Curves.linear,
-          duration: Duration(milliseconds: 300));
+          duration: Duration(milliseconds: 200));
       if (_daylistCurrIndex > 0) {
         _daylistCurrIndex--;
       }
@@ -263,37 +278,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                Container(
-                  height: (MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.bottom -
-                          MediaQuery.of(context).padding.top) *
-                      0.82,
-                  child: (tasks.isEmpty && _showOnlyToDo)
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(left: 25),
-                              child: Image.asset(
-                                'assets/images/no_tasks.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Text('You have no tasks for today'),
-                          ],
-                        )
-                      : ListView.builder(
-                          itemCount: tasks.length,
-                          itemBuilder: (context, i) => TaskItem(
-                            id: tasks[i].id,
-                            title: tasks[i].title,
-                            date: tasks[i].date,
-                            projectId: tasks[i].projectId,
-                            isDone: tasks[i].isDone,
-                          ),
+                _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: () async {
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .fetchTasks();
+                        },
+                        child: Container(
+                          height: (MediaQuery.of(context).size.height -
+                                  MediaQuery.of(context).padding.bottom -
+                                  MediaQuery.of(context).padding.top) *
+                              0.82,
+                          child: (tasks.isEmpty && _showOnlyToDo)
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(left: 25),
+                                      child: Image.asset(
+                                        'assets/images/no_tasks.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Text('You have no tasks for today'),
+                                  ],
+                                )
+                              : ListView.builder(
+                                  itemCount: tasks.length,
+                                  itemBuilder: (context, i) => TaskItem(
+                                    id: tasks[i].id,
+                                    title: tasks[i].title,
+                                    date: tasks[i].date,
+                                    projectId: tasks[i].projectId,
+                                    isDone: tasks[i].isDone,
+                                  ),
+                                ),
                         ),
-                ),
+                      ),
               ]),
         ),
       ),

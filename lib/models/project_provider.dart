@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pomodoro_app/models/project.dart';
 
 class ProjectProvider with ChangeNotifier {
@@ -17,7 +20,12 @@ class ProjectProvider with ChangeNotifier {
     return [..._projects]; //get copy of list intead of reference
   }
 
-  void addProject(Project project) {
+  Future<void> addProject(Project project) async {
+    const url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks.json';
+    http.post(url, body: json.encode(
+      'title': project.title,
+    ));
     final newProject = Project(
       id: DateTime.now().toString(),
       title: project.title,

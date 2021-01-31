@@ -27,12 +27,19 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   final _form = GlobalKey<FormState>();
   final _titleFocusNode = FocusNode();
   var _choosenProject = Project(id: null, title: null);
-  var _editedTask =
-      Task(id: null, title: '', date: null, isDone: false, projectId: null);
+  var _editedTask = Task(
+      id: null,
+      title: '',
+      date: null,
+      isDone: false,
+      projectId: null,
+      doneDate: null);
   String _pomodoroNumber = '0';
   String _allPomodoroDuration = '0';
   //var for loading task when in editing mode
   var _isInit = true;
+  var _isLoading = false;
+
   //check if argument passed in route wchich means editting mode
   @override
   void didChangeDependencies() {
@@ -79,20 +86,50 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     super.dispose();
   }
 
-  void _taskFormSubmit() {
+  Future<void> _taskFormSubmit() async {
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
     }
     _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
+
     if (_editedTask.id != null) {
       Provider.of<TaskProvider>(context, listen: false)
           .updateTask(_editedTask.id, _editedTask);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     } else {
-      Provider.of<TaskProvider>(context, listen: false).addTask(_editedTask);
+      try {
+        await Provider.of<TaskProvider>(context, listen: false)
+            .addTask(_editedTask);
+      } catch (error) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Something went wrong!"),
+            content: Text('Please, try again later'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+          Navigator.of(context).pop();
+        });
+      }
     }
-
-    Navigator.of(context).pop();
   }
 
   Future<String> _chooseDate(BuildContext context) {
@@ -111,7 +148,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         });
   }
 
-  Future<bool> _deleteDialog(BuildContext context, String taskId) {
+  Future<bool> _deleteDialog(
+    BuildContext context,
+    String taskId,
+  ) {
     return showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -128,6 +168,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   onPressed: () {
                     Provider.of<TaskProvider>(context, listen: false)
                         .deleteTask(taskId);
+
                     Navigator.of(ctx).pop();
                     Navigator.of(ctx).pop();
                   },
@@ -152,213 +193,226 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             )
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Container(
-          child: Form(
-            key: _form,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: TextFormField(
-                    initialValue: _titleInitialValue,
-                    focusNode: _titleFocusNode,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                        hintText: 'What need to be done?',
-                        labelText: 'Description',
-                        labelStyle:
-                            TextStyle(color: Theme.of(context).accentColor)),
-                    onSaved: (value) {
-                      _editedTask = Task(
-                          id: _editedTask.id,
-                          title: value,
-                          projectId: _editedTask.projectId,
-                          date: _editedTask.date,
-                          isDone: _editedTask.isDone);
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Task title can`t be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                InkWell(
-                  onTap: () => _chooseDate(context).then((onValue) {
-                    setState(() {
-                      if (onValue == null) {
-                        _dateFieldController.text = 'No duedate';
-                      } else {
-                        _dateFieldController.text = onValue;
-                      }
-                    });
-                  }),
-                  child: Container(
-                    margin: EdgeInsets.only(top: 8, bottom: 4),
-                    child: TextFormField(
-                      controller: _dateFieldController,
-                      enabled: false,
-                      decoration: InputDecoration(
-                          labelText: 'Duedate',
-                          labelStyle:
-                              TextStyle(color: Theme.of(context).accentColor)),
-                      keyboardType: TextInputType.datetime,
-                      onSaved: (value) {
-                        if (value.contains('No duedate') ||
-                            value == null ||
-                            value.isEmpty) {
-                          _editedTask = Task(
-                              id: _editedTask.id,
-                              title: _editedTask.title,
-                              projectId: _editedTask.projectId,
-                              date: null,
-                              isDone: _editedTask.isDone);
-                        } else {
-                          _editedTask = Task(
-                              id: _editedTask.id,
-                              title: _editedTask.title,
-                              projectId: _editedTask.projectId,
-                              date: DateFormat('dd/MM/yyyy').parse(value),
-                              isDone: _editedTask.isDone);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () => {
-                    if (!_isProjectScoped)
-                      {
-                        _chooseProject(context).then((onValue) {
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: EdgeInsets.all(16),
+              child: Container(
+                child: Form(
+                  key: _form,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: TextFormField(
+                          initialValue: _titleInitialValue,
+                          focusNode: _titleFocusNode,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                              hintText: 'What need to be done?',
+                              labelText: 'Description',
+                              labelStyle: TextStyle(
+                                  color: Theme.of(context).accentColor)),
+                          onSaved: (value) {
+                            _editedTask = Task(
+                                id: _editedTask.id,
+                                title: value,
+                                projectId: _editedTask.projectId,
+                                date: _editedTask.date,
+                                isDone: _editedTask.isDone,
+                                doneDate: _editedTask.doneDate);
+                          },
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Task title can`t be empty';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => _chooseDate(context).then((onValue) {
                           setState(() {
-                            _projectFieldController.text = onValue.title;
-                            if (onValue.id == null) {
-                              _projectFieldController.text = 'No project';
-                              _choosenProject = Project(id: null, title: null);
+                            if (onValue == null) {
+                              _dateFieldController.text = 'No duedate';
                             } else {
-                              _projectFieldController.text = onValue.title;
-                              _choosenProject =
-                                  Project(id: onValue.id, title: onValue.title);
+                              _dateFieldController.text = onValue;
                             }
                           });
-                        })
-                      }
-                    else
-                      {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text(_projectFieldController.text),
-                            content: Text(
-                                'You can`t assign task to different project'),
-                            actions: [
-                              FlatButton(
-                                child: Text('Ok'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              )
-                            ],
+                        }),
+                        child: Container(
+                          margin: EdgeInsets.only(top: 8, bottom: 4),
+                          child: TextFormField(
+                            controller: _dateFieldController,
+                            enabled: false,
+                            decoration: InputDecoration(
+                                labelText: 'Duedate',
+                                labelStyle: TextStyle(
+                                    color: Theme.of(context).accentColor)),
+                            keyboardType: TextInputType.datetime,
+                            onSaved: (value) {
+                              if (value.contains('No duedate') ||
+                                  value == null ||
+                                  value.isEmpty) {
+                                _editedTask = Task(
+                                    id: _editedTask.id,
+                                    title: _editedTask.title,
+                                    projectId: _editedTask.projectId,
+                                    date: null,
+                                    isDone: _editedTask.isDone,
+                                    doneDate: _editedTask.doneDate);
+                              } else {
+                                _editedTask = Task(
+                                    id: _editedTask.id,
+                                    title: _editedTask.title,
+                                    projectId: _editedTask.projectId,
+                                    date: DateFormat('dd/MM/yyyy').parse(value),
+                                    isDone: _editedTask.isDone,
+                                    doneDate: _editedTask.doneDate);
+                              }
+                            },
                           ),
-                        )
-                      }
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(top: 4, bottom: 16),
-                    width: double.infinity,
-                    child: TextFormField(
-                      controller: _projectFieldController,
-                      enabled: false,
-                      decoration: InputDecoration(
-                          hintText: 'No project',
-                          labelText: 'Project',
-                          labelStyle:
-                              TextStyle(color: Theme.of(context).accentColor)),
-                      onSaved: (value) {
-                        if (value != 'No project') {
-                          _editedTask = Task(
-                              id: _editedTask.id,
-                              title: _editedTask.title,
-                              projectId: _choosenProject.id,
-                              date: _editedTask.date,
-                              isDone: _editedTask.isDone);
-                        } else {
-                          _editedTask = Task(
-                              id: _editedTask.id,
-                              title: _editedTask.title,
-                              projectId: null,
-                              date: _editedTask.date,
-                              isDone: _editedTask.isDone);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                if (_editedTask.id != null)
-                  Container(
-                      child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: Row(
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => {
+                          if (!_isProjectScoped)
+                            {
+                              _chooseProject(context).then((onValue) {
+                                setState(() {
+                                  //_projectFieldController.text = onValue.title;
+                                  if (onValue.id == null) {
+                                    _projectFieldController.text = 'No project';
+                                    _choosenProject =
+                                        Project(id: null, title: null);
+                                  } else {
+                                    _projectFieldController.text =
+                                        onValue.title;
+                                    _choosenProject = Project(
+                                        id: onValue.id, title: onValue.title);
+                                  }
+                                });
+                              })
+                            }
+                          else
+                            {
+                              showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: Text(_projectFieldController.text),
+                                  content: Text(
+                                      'You can`t assign task to different project'),
+                                  actions: [
+                                    FlatButton(
+                                      child: Text('Ok'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ],
+                                ),
+                              )
+                            }
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 4, bottom: 16),
+                          width: double.infinity,
+                          child: TextFormField(
+                            controller: _projectFieldController,
+                            enabled: false,
+                            decoration: InputDecoration(
+                                hintText: 'No project',
+                                labelText: 'Project',
+                                labelStyle: TextStyle(
+                                    color: Theme.of(context).accentColor)),
+                            onSaved: (value) {
+                              if (value != 'No project') {
+                                _editedTask = Task(
+                                    id: _editedTask.id,
+                                    title: _editedTask.title,
+                                    projectId: _choosenProject.id,
+                                    date: _editedTask.date,
+                                    isDone: _editedTask.isDone,
+                                    doneDate: _editedTask.doneDate);
+                              } else {
+                                _editedTask = Task(
+                                    id: _editedTask.id,
+                                    title: _editedTask.title,
+                                    projectId: null,
+                                    date: _editedTask.date,
+                                    isDone: _editedTask.isDone,
+                                    doneDate: _editedTask.doneDate);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      if (_editedTask.id != null)
+                        Container(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4.0),
-                              child: Icon(
-                                Icons.timer_rounded,
+                            Container(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: Icon(
+                                      Icons.timer_rounded,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Pomodoro numbers',
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ],
                               ),
                             ),
-                            Text(
-                              'Pomodoro numbers',
-                              style: TextStyle(fontSize: 16),
-                            )
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  _pomodoroNumber,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Icon(
-                                  Icons.timer_rounded,
-                                  size: 16,
-                                )
-                              ],
+                            Container(
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        _pomodoroNumber,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Icon(
+                                        Icons.timer_rounded,
+                                        size: 16,
+                                      )
+                                    ],
+                                  ),
+                                  if (_pomodoroNumber != '0')
+                                    Text(_allPomodoroDuration)
+                                ],
+                              ),
                             ),
-                            if (_pomodoroNumber != '0')
-                              Text(_allPomodoroDuration)
                           ],
+                        )),
+                      Container(
+                        margin: EdgeInsets.only(top: 25, bottom: 10),
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.08,
+                        child: RaisedButton(
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(25)),
+                          color: Theme.of(context).accentColor,
+                          textColor: Theme.of(context).primaryColor,
+                          child: Text(
+                            _editedTask.id == null
+                                ? 'Create task'
+                                : 'Save task',
+                          ),
+                          onPressed: _taskFormSubmit,
                         ),
-                      ),
+                      )
                     ],
-                  )),
-                Container(
-                  margin: EdgeInsets.only(top: 25, bottom: 10),
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.08,
-                  child: RaisedButton(
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(25)),
-                    color: Theme.of(context).accentColor,
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(
-                      _editedTask.id == null ? 'Create task' : 'Save task',
-                    ),
-                    onPressed: _taskFormSubmit,
                   ),
-                )
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
