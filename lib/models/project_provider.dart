@@ -20,12 +20,23 @@ class ProjectProvider with ChangeNotifier {
     return [..._projects]; //get copy of list intead of reference
   }
 
+  //http get to get projects from firebase
+  Future<void> fetchProjects() async {
+    const url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
+    try {
+      http.get(url);
+    } catch (error) {}
+  }
+
+  //http post to add project to firebase
   Future<void> addProject(Project project) async {
     const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks.json';
-    http.post(url, body: json.encode(
-      'title': project.title,
-    ));
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
+    http.post(url,
+        body: json.encode({
+          'title': project.title,
+        }));
     final newProject = Project(
       id: DateTime.now().toString(),
       title: project.title,

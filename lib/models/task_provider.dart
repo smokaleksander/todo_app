@@ -145,7 +145,10 @@ class TaskProvider with ChangeNotifier {
     try {
       final response = await http.patch(
         url,
-        body: json.encode({'isDone': _tasks[taskIndex].isDone}),
+        body: json.encode({
+          'isDone': _tasks[taskIndex].isDone,
+          'doneDate': _tasks[taskIndex].doneDate.toIso8601String()
+        }),
       );
       if (response.statusCode >= 400) {
         _tasks[taskIndex].toggleIsDone();
@@ -164,7 +167,6 @@ class TaskProvider with ChangeNotifier {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
       final List<Task> loadedTasks = [];
-      print(response.body);
       data.forEach((taskId, taskData) {
         loadedTasks.add(Task(
             id: taskId,
@@ -184,7 +186,7 @@ class TaskProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw HttpException('fetch failed');
     }
   }
 
@@ -213,7 +215,7 @@ class TaskProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw HttpException('Task creating failed. Please, try again later');
     }
   }
 
@@ -230,10 +232,13 @@ class TaskProvider with ChangeNotifier {
                 : updatedTask.date.toIso8601String(),
             'projectId': updatedTask.projectId,
             'isDone': updatedTask.isDone,
-            'doneDate': updatedTask.doneDate =
-                null ? null : updatedTask.doneDate
+            'doneDate':
+                updatedTask.doneDate == null ? null : updatedTask.doneDate
           }));
-    } catch (error) {}
+    } catch (error) {
+      print(error);
+      throw HttpException('Task edit failed, try again later');
+    }
     _tasks[taskIndex] = updatedTask;
     notifyListeners();
   }

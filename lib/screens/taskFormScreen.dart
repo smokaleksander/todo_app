@@ -44,22 +44,28 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
+      //get arguments from navigator object
       final args = ModalRoute.of(context).settings.arguments as Map;
       final taskId = args['taskId'];
       final projectId = args['projectId'];
+      //check if task id was passed, if so ->edit mode and fetch object
       if (taskId != null) {
         _editedTask =
             Provider.of<TaskProvider>(context, listen: false).findById(taskId);
         _titleInitialValue = _editedTask.title;
+        //get pomodor numbers for task
         final stats = Provider.of<PomodoroProvider>(context, listen: false)
             .getStatsForTask(taskId);
         _pomodoroNumber = stats['pomoNum'].toString();
         _allPomodoroDuration = printDuration(stats['length'],
             abbreviated: true, tersity: DurationTersity.minute);
+
+        //set date if passed
         if (_editedTask.date != null) {
           _dateFieldController.text =
               DateFormat('dd/MM/yyyy').format(_editedTask.date).toString();
         }
+        //get project details fot task if project id passed
         if (_editedTask.projectId != null) {
           _projectFieldController.text =
               Provider.of<ProjectProvider>(context, listen: false)
@@ -67,6 +73,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   .title;
         }
       }
+      //if project ID passed through navigator-> adding/editting task in specific project
       if (projectId != null) {
         _choosenProject = Provider.of<ProjectProvider>(context, listen: false)
             .findById(projectId);
@@ -95,24 +102,39 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     setState(() {
       _isLoading = true;
     });
-
+    //if task id is set we are in edit mode -> update
     if (_editedTask.id != null) {
       Provider.of<TaskProvider>(context, listen: false)
-          .updateTask(_editedTask.id, _editedTask);
-      setState(() {
-        _isLoading = false;
+          .updateTask(_editedTask.id, _editedTask)
+          .catchError((error) {
+        return showDialog<Null>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                    title: Text("Something went wrong!"),
+                    content: Text(error.toString()),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ]));
+      }).then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
       });
-      Navigator.of(context).pop();
     } else {
-      try {
-        await Provider.of<TaskProvider>(context, listen: false)
-            .addTask(_editedTask);
-      } catch (error) {
-        await showDialog(
+      Provider.of<TaskProvider>(context, listen: false)
+          .addTask(_editedTask)
+          .catchError((error) {
+        showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text("Something went wrong!"),
-            content: Text('Please, try again later'),
+            content: Text(error.toString()),
             actions: <Widget>[
               FlatButton(
                 child: Text('OK'),
@@ -122,13 +144,13 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               )
             ],
           ),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
+        ).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
           Navigator.of(context).pop();
         });
-      }
+      });
     }
   }
 
@@ -166,10 +188,13 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 FlatButton(
                   child: Text('yes'),
                   onPressed: () {
-                    Provider.of<TaskProvider>(context, listen: false)
-                        .deleteTask(taskId);
-
+                    setState(() {
+                      _isLoading = true;
+                    });
                     Navigator.of(ctx).pop();
+                    Provider.of<TaskProvider>(context, listen: false)
+                        .deleteTask(taskId)
+                        .catchError((error) {});
                     Navigator.of(ctx).pop();
                   },
                 )
