@@ -6,12 +6,14 @@ import 'package:pomodoro_app/models/httpException.dart';
 import 'package:pomodoro_app/models/project.dart';
 
 class ProjectProvider with ChangeNotifier {
+  final String authToken;
   List<Project> _projects = [
     // Project(id: 'c1', title: 'Italian'),
     // Project(id: 'c2', title: 'Q uick & Easy'),
     // Project(id: 'c3', title: 'Hamburgers'),
   ];
 
+  ProjectProvider(this.authToken, this._projects);
   Project findById(String id) {
     return _projects.firstWhere((project) => project.id == id);
   }
@@ -23,8 +25,8 @@ class ProjectProvider with ChangeNotifier {
 
   //http get to get projects from firebase
   Future<void> fetchProjects() async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
@@ -45,8 +47,8 @@ class ProjectProvider with ChangeNotifier {
 
   //http post to add project to firebase
   Future<void> addProject(Project project) async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json?auth=$authToken';
     try {
       final response = await http.post(url,
           body: json.encode({
@@ -66,7 +68,7 @@ class ProjectProvider with ChangeNotifier {
   Future<void> updateProject(String id, Project updatedProject) async {
     final projectIndex = _projects.indexWhere((project) => project.id == id);
     final url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json';
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json?auth=$authToken';
 
     try {
       await http.patch(url, body: json.encode({'title': updatedProject.title}));
@@ -80,7 +82,7 @@ class ProjectProvider with ChangeNotifier {
 
   Future<void> deleteProject(String id) async {
     final url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json';
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json?auth=$authToken';
     final exisitingProjectIndex =
         _projects.indexWhere((project) => project.id == id);
     var existingProject = _projects[exisitingProjectIndex];

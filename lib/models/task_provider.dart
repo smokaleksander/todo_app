@@ -57,6 +57,10 @@ class TaskProvider with ChangeNotifier {
     // ),
     // Task(id: 't9', title: 'task9', isDone: false),
   ];
+  final String authToken;
+  final String userId;
+  TaskProvider(this.authToken, this._tasks, this.userId);
+
   List<Task> get tasks {
     return [..._tasks];
   }
@@ -158,7 +162,7 @@ class TaskProvider with ChangeNotifier {
     _tasks[taskIndex].toggleIsDone();
     notifyListeners();
     final url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$id.json';
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId/$id.json?auth=$authToken';
     //(_tasks.firstWhere((ts) => ts.id == id)).toggleIsDone();
     try {
       final response = await http.patch(
@@ -182,8 +186,8 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> fetchTasks() async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
@@ -213,8 +217,8 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> addTask(Task task) async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId.json?auth=$authToken';
     try {
       //http post
       final response = await http.post(url,
@@ -244,7 +248,7 @@ class TaskProvider with ChangeNotifier {
   Future<void> updateTask(String id, Task updatedTask) async {
     final taskIndex = _tasks.indexWhere((task) => task.id == id);
     final url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$id.json';
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId/$id.json?auth=$authToken';
     try {
       await http.patch(url,
           body: json.encode({
@@ -267,7 +271,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> deleteTask(String id) async {
     final url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$id.json';
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId/$id.json?auth=$authToken';
     final existingTaskIndex = _tasks.indexWhere((ts) => ts.id == id);
     var existingTask = _tasks[existingTaskIndex];
     _tasks.removeAt(existingTaskIndex);
@@ -285,7 +289,7 @@ class TaskProvider with ChangeNotifier {
     for (var i = 0; i < _tasks.length; i++) {
       if (_tasks[i].projectId == projectId) {
         final url =
-            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/${_tasks[i].id}.json';
+            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId/${_tasks[i].id}.json?auth=$authToken';
         var existingTask = _tasks[i];
         _tasks.removeAt(i);
         notifyListeners();
@@ -305,7 +309,7 @@ class TaskProvider with ChangeNotifier {
       if (_tasks[i].projectId == projectId) {
         var deletedProjectId = _tasks[i].projectId;
         final url =
-            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/${_tasks[i].id}.json';
+            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/$userId/${_tasks[i].id}.json?auth=$authToken';
         try {
           var response =
               await http.patch(url, body: json.encode({'projectId': null}));

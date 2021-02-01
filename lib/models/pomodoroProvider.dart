@@ -7,10 +7,17 @@ import './pomodoro.dart';
 
 class PomodoroProvider with ChangeNotifier {
   List<Pomodoro> _pomodoros = List();
+  final String authToken;
+
+  PomodoroProvider(this.authToken, this._pomodoros);
+
+  List<Pomodoro> get pomodoros {
+    return [..._pomodoros]; //get copy of list intead of reference
+  }
 
   Future<void> fetchPomodoros() async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/pomodoros.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/pomodoros.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
@@ -33,8 +40,8 @@ class PomodoroProvider with ChangeNotifier {
   }
 
   Future<void> addPomodoro(Pomodoro passedPomo) async {
-    const url =
-        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/pomodoros.json';
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/pomodoros.json?auth=$authToken';
 
     try {
       final response = await http.post(url,
