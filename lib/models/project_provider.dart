@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pomodoro_app/models/httpException.dart';
 import 'package:pomodoro_app/models/project.dart';
 
 class ProjectProvider with ChangeNotifier {
   List<Project> _projects = [
-    Project(id: 'c1', title: 'Italian'),
-    Project(id: 'c2', title: 'Q uick & Easy'),
-    Project(id: 'c3', title: 'Hamburgers'),
+    // Project(id: 'c1', title: 'Italian'),
+    // Project(id: 'c2', title: 'Q uick & Easy'),
+    // Project(id: 'c3', title: 'Hamburgers'),
   ];
 
   Project findById(String id) {
@@ -25,34 +26,72 @@ class ProjectProvider with ChangeNotifier {
     const url =
         'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
     try {
-      http.get(url);
-    } catch (error) {}
+      final response = await http.get(url);
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final List<Project> loadedProjects = [];
+      if (data != null) {
+        data.forEach((projectId, projectData) {
+          loadedProjects
+              .add(Project(id: projectId, title: projectData['title']));
+        });
+      }
+      _projects = loadedProjects;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw HttpException('Loading projects failed. Please, try again later');
+    }
   }
 
   //http post to add project to firebase
   Future<void> addProject(Project project) async {
     const url =
         'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects.json';
-    http.post(url,
-        body: json.encode({
-          'title': project.title,
-        }));
-    final newProject = Project(
-      id: DateTime.now().toString(),
-      title: project.title,
-    );
-    _projects.add(newProject);
-    notifyListeners();
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'title': project.title,
+          }));
+      final newProject =
+          Project(id: json.decode(response.body)['name'], title: project.title);
+      _projects.add(newProject);
+      notifyListeners();
+    } catch (error) {
+      print('error:');
+      print(error);
+      throw HttpException('Project creating failed. Please, try again later');
+    }
   }
 
-  void updateProject(String id, Project updatedProject) {
+  Future<void> updateProject(String id, Project updatedProject) async {
     final projectIndex = _projects.indexWhere((project) => project.id == id);
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json';
+
+    try {
+      await http.patch(url, body: json.encode({'title': updatedProject.title}));
+    } catch (error) {
+      print(error);
+      throw HttpException('Project edit failed. Please, try again later');
+    }
     _projects[projectIndex] = updatedProject;
     notifyListeners();
   }
 
-  void deleteProject(String id) {
-    _projects.removeWhere((project) => project.id == id);
+  Future<void> deleteProject(String id) async {
+    final url =
+        'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/projects/$id.json';
+    final exisitingProjectIndex =
+        _projects.indexWhere((project) => project.id == id);
+    var existingProject = _projects[exisitingProjectIndex];
+    _projects.removeAt(exisitingProjectIndex);
     notifyListeners();
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _projects.insert(exisitingProjectIndex, existingProject);
+      notifyListeners();
+      throw HttpException('Could not delete project');
+    }
+    existingProject = null;
   }
 }

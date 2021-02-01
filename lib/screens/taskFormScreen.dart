@@ -130,7 +130,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       Provider.of<TaskProvider>(context, listen: false)
           .addTask(_editedTask)
           .catchError((error) {
-        showDialog(
+        return showDialog<Null>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text("Something went wrong!"),
@@ -144,12 +144,12 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               )
             ],
           ),
-        ).then((_) {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.of(context).pop();
+        );
+      }).then((_) {
+        setState(() {
+          _isLoading = false;
         });
+        Navigator.of(context).pop();
       });
     }
   }

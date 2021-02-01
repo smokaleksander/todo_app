@@ -132,6 +132,9 @@ class TaskProvider with ChangeNotifier {
         }
       }
     }
+    if (todo == 0) {
+      return 0;
+    }
     return (done / todo * 100);
   }
 
@@ -147,7 +150,9 @@ class TaskProvider with ChangeNotifier {
         url,
         body: json.encode({
           'isDone': _tasks[taskIndex].isDone,
-          'doneDate': _tasks[taskIndex].doneDate.toIso8601String()
+          'doneDate': _tasks[taskIndex].doneDate != null
+              ? _tasks[taskIndex].doneDate.toIso8601String()
+              : null,
         }),
       );
       if (response.statusCode >= 400) {
@@ -155,6 +160,7 @@ class TaskProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (error) {
+      print(error);
       _tasks[taskIndex].toggleIsDone();
       notifyListeners();
     }
@@ -167,25 +173,26 @@ class TaskProvider with ChangeNotifier {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
       final List<Task> loadedTasks = [];
-      data.forEach((taskId, taskData) {
-        loadedTasks.add(Task(
-            id: taskId,
-            title: taskData['title'],
-            isDone: taskData['isDone'],
-            date: taskData['date'] == null
-                ? null
-                : DateTime.parse(taskData['date']),
-            projectId: taskData['projectId'],
-            doneDate: taskData['doneDate'] == null
-                ? null
-                : DateTime.parse(taskData['doneDate'])));
-      });
-      _tasks = loadedTasks;
-      for (int i = 0; i < _tasks.length; i++) {
-        print(_tasks[i].title);
+      if (data != null) {
+        data.forEach((taskId, taskData) {
+          loadedTasks.add(Task(
+              id: taskId,
+              title: taskData['title'],
+              isDone: taskData['isDone'],
+              date: taskData['date'] == null
+                  ? null
+                  : DateTime.parse(taskData['date']),
+              projectId: taskData['projectId'],
+              doneDate: taskData['doneDate'] == null
+                  ? null
+                  : DateTime.parse(taskData['doneDate'])));
+        });
       }
+      _tasks = loadedTasks;
+
       notifyListeners();
     } catch (error) {
+      print(error);
       throw HttpException('fetch failed');
     }
   }
@@ -259,21 +266,48 @@ class TaskProvider with ChangeNotifier {
     existingTask = null;
   }
 
-  void deleteTasksWithProjectId(String projectId) {
-    _tasks.removeWhere((ts) => ts.projectId == projectId);
-    notifyListeners();
-  }
-
-  void setTasksProjectIdToNull(String projectId) {
+  Future<void> deleteTasksWithProjectId(String projectId) async {
     for (var i = 0; i < _tasks.length; i++) {
       if (_tasks[i].projectId == projectId) {
-        Task oldtask = _tasks[i];
-        _tasks[i] = Task(
-            projectId: null,
-            id: oldtask.id,
-            title: oldtask.title,
-            date: oldtask.date,
-            isDone: oldtask.isDone);
+        final url =
+            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/${_tasks[i].id}.json';
+        var existingTask = _tasks[i];
+        _tasks.removeAt(i);
+        notifyListeners();
+        final response = await http.delete(url);
+        if (response.statusCode >= 400) {
+          _tasks.insert(i, existingTask);
+          notifyListeners();
+          throw HttpException('Could not delete product');
+        }
+        existingTask = null;
+      }
+    }
+  }
+
+  Future<void> setTasksProjectIdToNull(String projectId) async {
+    for (var i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].projectId == projectId) {
+        var deletedProjectId = _tasks[i].projectId;
+        final url =
+            'https://getitdone-fc7d7-default-rtdb.europe-west1.firebasedatabase.app/tasks/${_tasks[i].id}.json';
+        try {
+          var response =
+              await http.patch(url, body: json.encode({'projectId': null}));
+          if (response.statusCode >= 400) {
+            _tasks[i] = Task(
+                id: _tasks[i].id,
+                title: _tasks[i].title,
+                isDone: _tasks[i].isDone,
+                doneDate: _tasks[i].doneDate,
+                projectId: deletedProjectId);
+            notifyListeners();
+          }
+        } catch (error) {
+          print(error);
+          throw HttpException(
+              'Projects`s tasks editing failed, try again later');
+        }
       }
     }
     notifyListeners();

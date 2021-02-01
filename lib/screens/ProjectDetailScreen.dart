@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro_app/models/project.dart';
 import 'package:pomodoro_app/models/project_provider.dart';
 import 'package:pomodoro_app/screens/taskFormScreen.dart';
 import 'package:provider/provider.dart';
@@ -24,17 +25,71 @@ class ProjectDetailScreen extends StatefulWidget {
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   var _deleteOptionTriggered = false;
   var _showOnlyToDo = true;
+  var _isLoading = false;
+  Project project = Project(id: null, title: '');
 
-  void _deleteProjectWithTasks(String id) {
+  Future<void> _deleteProjectWithTasks(String id) async {
+    setState(() {
+      _isLoading = true;
+    });
     Provider.of<TaskProvider>(context, listen: false)
-        .deleteTasksWithProjectId(id);
-    Provider.of<ProjectProvider>(context, listen: false).deleteProject(id);
+        .deleteTasksWithProjectId(id)
+        .catchError((error) {
+      print(error);
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    });
+    Provider.of<ProjectProvider>(context, listen: false)
+        .deleteProject(id)
+        .catchError((error) {
+      return showDialog<Null>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Something went wrong!"),
+          content: Text(error.toString()),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+    });
   }
 
-  void _deleteProjectWithoutTasks(String id) {
+  Future<void> _deleteProjectWithoutTasks(String id) async {
+    setState(() {
+      _isLoading = true;
+    });
     Provider.of<TaskProvider>(context, listen: false)
-        .setTasksProjectIdToNull(id);
-    Provider.of<ProjectProvider>(context, listen: false).deleteProject(id);
+        .setTasksProjectIdToNull(id)
+        .catchError((error) {
+      return;
+    });
+    Provider.of<ProjectProvider>(context, listen: false)
+        .deleteProject(id)
+        .catchError((error) {
+      return showDialog<Null>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Something went wrong!"),
+          content: Text(error.toString()),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+    });
   }
 
   Future<bool> _deleteDialog(BuildContext context, String projectId) {
@@ -48,7 +103,32 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 FlatButton(
                     child: Text('No'),
                     onPressed: () {
-                      _deleteProjectWithoutTasks(projectId);
+                      _deleteProjectWithoutTasks(projectId).then((_) {
+                        setState(() {
+                          _deleteOptionTriggered = true;
+                          _isLoading = false;
+                        });
+                        Navigator.of(ctx).pop();
+                        Navigator.of(ctx).pop();
+                        Scaffold.of(context).hideCurrentSnackBar();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text("Project deleted!"),
+                          duration: Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: "UNDO",
+                            onPressed: () {},
+                          ),
+                        ));
+                      });
+                    }),
+                FlatButton(
+                  child: Text('yes'),
+                  onPressed: () {
+                    _deleteProjectWithTasks(projectId).then((_) {
+                      setState(() {
+                        _deleteOptionTriggered = true;
+                        _isLoading = false;
+                      });
                       Navigator.of(ctx).pop();
                       Navigator.of(ctx).pop();
                       Scaffold.of(context).hideCurrentSnackBar();
@@ -60,13 +140,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                           onPressed: () {},
                         ),
                       ));
-                    }),
-                FlatButton(
-                  child: Text('yes'),
-                  onPressed: () {
-                    _deleteProjectWithTasks(projectId);
-                    Navigator.of(ctx).pop();
-                    Navigator.of(ctx).pop();
+                    });
                   },
                 )
               ],
@@ -78,7 +152,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     //project id passed when screen detail is pushed to show the correct project
     final passedProjectId = ModalRoute.of(context).settings.arguments as String;
     // get the correct project data by its id
-    var project;
+
     if (!_deleteOptionTriggered) {
       project = Provider.of<ProjectProvider>(context).findById(passedProjectId);
     }
@@ -152,29 +226,33 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               arguments: {'taskId': null, 'projectId': project.id});
         },
       ),
-      body: Column(
-        children: <Widget>[
-          // Card(
-          //   margin: EdgeInsets.all(15),
-          //   child: Padding(
-          //     padding: EdgeInsets.all(8),
-          //     child: Text('project description'),
-          //   ),
-          // ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, i) => TaskItem(
-                id: tasks[i].id,
-                title: tasks[i].title,
-                date: tasks[i].date,
-                projectId: tasks[i].projectId,
-                isDone: tasks[i].isDone,
-              ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Column(
+              children: <Widget>[
+                // Card(
+                //   margin: EdgeInsets.all(15),
+                //   child: Padding(
+                //     padding: EdgeInsets.all(8),
+                //     child: Text('project description'),
+                //   ),
+                // ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, i) => TaskItem(
+                      id: tasks[i].id,
+                      title: tasks[i].title,
+                      date: tasks[i].date,
+                      projectId: tasks[i].projectId,
+                      isDone: tasks[i].isDone,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

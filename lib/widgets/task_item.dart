@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pomodoro_app/models/task_provider.dart';
@@ -114,9 +116,16 @@ class TaskItem extends StatelessWidget {
                       .changeStatus(id);
                   Scaffold.of(context).hideCurrentSnackBar();
                   Scaffold.of(context).showSnackBar(SnackBar(
-                    content: isDone
-                        ? Text(title + " still nedd to be done")
-                        : Text(title + " completed!"),
+                    padding: EdgeInsets.only(bottom: 5, left: 16),
+                    backgroundColor: Theme.of(context).primaryColor,
+                    behavior: SnackBarBehavior.floating,
+                    elevation: 0,
+                    content: Text(
+                      isDone
+                          ? title + " still nedd to be done"
+                          : title + " completed!",
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                    ),
                     duration: Duration(seconds: 2),
                     action: SnackBarAction(
                       label: "UNDO",

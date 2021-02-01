@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<DateTime> _calendarDates;
-  List<Task> tasks = List<Task>();
+  List<Task> tasks = [];
   var _dayListItemSize = 45.0;
   int _daylistCurrIndex = 14;
   //var _curDate = DateTime.now();
@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ScrollController _dayListScrollController;
   var _isInit = true;
   var _isLoading = false;
+  var tasksProvider = null;
   // generate 14 days before and after today
 
   @override
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
       });
-      print('fetching');
+
+      // TODO: add catch error
       Provider.of<TaskProvider>(context).fetchTasks().then((_) {
         setState(() {
           _isLoading = false;
@@ -44,11 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       _isInit = false;
     }
-    final tasksData = Provider.of<TaskProvider>(context);
-    tasks = tasksData.tasks;
-    // tasks = _showOnlyToDo
-    //     ? tasksData.findbyDateAndToDo(_calendarDates[_daylistCurrIndex])
-    //     : tasksData.findbyDateAndDone(_calendarDates[_daylistCurrIndex]);
+    tasksProvider = Provider.of<TaskProvider>(context);
+    //tasks = tasksData.tasks;
     super.didChangeDependencies();
   }
 
@@ -94,22 +93,17 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  List<Task> _filterDone(List<Task> list) {
-    return list.where((ts) => ts.isDone == true).toList();
-  }
-
-  List<Task> _filterTodo(List<Task> list) {
-    return list.where((ts) => ts.isDone == false).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     var _dayListItemSize = 45.0;
     // final tasksData = Provider.of<TaskProvider>(context)
     //     .findbyDate(_calendarDates[_daylistCurrIndex]);
-    // final tasks =
-    //     _showOnlyToDo ? _filterTodo(tasksData) : _filterDone(tasksData);
-
+    // tasks = _showOnlyToDo
+    //     ? tasks.where((ts) => ts.isDone == false)
+    //     : tasks.where((ts) => ts.isDone == true);
+    tasks = _showOnlyToDo
+        ? tasksProvider.findbyDateAndToDo(_calendarDates[_daylistCurrIndex])
+        : tasksProvider.findbyDateAndDone(_calendarDates[_daylistCurrIndex]);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -292,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   MediaQuery.of(context).padding.bottom -
                                   MediaQuery.of(context).padding.top) *
                               0.82,
-                          child: (tasks.isEmpty && _showOnlyToDo)
+                          child: tasks.isEmpty
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -304,7 +298,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    Text('You have no tasks for today'),
+                                    Text(
+                                      _showOnlyToDo
+                                          ? 'You don`t have any tasks'
+                                          : 'You did not finish any task',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
                                   ],
                                 )
                               : ListView.builder(

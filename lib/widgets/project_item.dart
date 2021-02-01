@@ -9,10 +9,8 @@ import './circleProgress.dart';
 class ProjectItem extends StatelessWidget {
   final String id;
   final String title;
-  final int doneTasks;
-  final int allTasks;
 
-  ProjectItem({this.id, this.title, this.allTasks, this.doneTasks});
+  ProjectItem({this.id, this.title});
   void goToProjectDetailsScreen(BuildContext ctx, String id) {
     Navigator.of(ctx).pushNamed(
       ProjectDetailScreen.route,
@@ -46,7 +44,8 @@ class ProjectItem extends StatelessWidget {
                     margin: EdgeInsets.symmetric(vertical: 16),
                     width: MediaQuery.of(context).size.height * 0.15,
                     height: MediaQuery.of(context).size.height * 0.15,
-                    child: Center(child: Text('${_currProgress.round()}%')),
+                    child: Center(
+                        child: Text('${_currProgress.round().toString()}%')),
                   ),
                 ),
               ),
