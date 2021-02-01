@@ -64,7 +64,7 @@ class TaskItem extends StatelessWidget {
         },
         onTap: () {
           Navigator.of(context).pushNamed(TaskFormScreen.route,
-              arguments: {'taskId': id, 'projectId': null});
+              arguments: {'taskId': id, 'projectId': projectId});
         },
         child: Card(
           shape:

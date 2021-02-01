@@ -20,16 +20,19 @@ class Clock {
     minutes = pomodoroLength;
   }
 
-  void savePomodoro() {
+  Future<void> savePomodoro() async {
     Pomodoro newPomo = Pomodoro(
         id: DateTime.now().toString(),
         finishedDate: DateTime.now(),
         taskId: taskId,
-        length: Duration(
-            seconds: (pomodoroLength * 60) - (minutes * 60) - seconds));
-    print(newPomo.taskId);
-    print(newPomo.length);
-    Provider.of<PomodoroProvider>(context, listen: false).addPomodoro(newPomo);
+        length: minutes == 0 ? 1 : minutes);
+
+    Provider.of<PomodoroProvider>(context, listen: false)
+        .addPomodoro(newPomo)
+        .catchError((error) {
+      print(error);
+      throw error;
+    });
   }
 }
 
@@ -68,7 +71,9 @@ class ClockProvider with ChangeNotifier {
           //timer finished
           clock.timer.cancel();
           //create and save pomodoro
-          clock.savePomodoro();
+          if (!clock.isBreakTime) {
+            clock.savePomodoro();
+          }
           //start a break
           clock.minutes = clock.breakLength;
           clock.isBreakTime = !clock.isBreakTime;

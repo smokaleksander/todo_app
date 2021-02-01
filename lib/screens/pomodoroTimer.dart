@@ -57,10 +57,23 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                 FlatButton(
                   child: Text('Stop and save'),
                   onPressed: () {
-                    clock.savePomodoro();
                     Provider.of<ClockProvider>(context, listen: false)
                         .stopTimer();
-
+                    clock.savePomodoro().catchError((error) {
+                      return showDialog<Null>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                                  title: Text("Something went wrong!"),
+                                  content: Text(error.toString()),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ]));
+                    });
                     //save this pomodoro
                     Navigator.of(ctx).pop();
                   },

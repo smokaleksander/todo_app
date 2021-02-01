@@ -4,7 +4,7 @@ class Pomodoro with ChangeNotifier {
   final String id;
   final DateTime finishedDate;
   final String taskId;
-  final Duration length;
+  final int length;
 
   Pomodoro({this.id, this.finishedDate, this.length, this.taskId});
 }

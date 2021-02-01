@@ -34,8 +34,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       isDone: false,
       projectId: null,
       doneDate: null);
-  String _pomodoroNumber = '0';
-  String _allPomodoroDuration = '0';
+  int _pomodoroNumber = 0;
+  int _allPomodoroDuration = 0;
   //var for loading task when in editing mode
   var _isInit = true;
   var _isLoading = false;
@@ -56,9 +56,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         //get pomodor numbers for task
         final stats = Provider.of<PomodoroProvider>(context, listen: false)
             .getStatsForTask(taskId);
-        _pomodoroNumber = stats['pomoNum'].toString();
-        _allPomodoroDuration = printDuration(stats['length'],
-            abbreviated: true, tersity: DurationTersity.minute);
+        _pomodoroNumber = stats['pomoNum'];
+        _allPomodoroDuration = stats['length'];
 
         //set date if passed
         if (_editedTask.date != null) {
@@ -102,6 +101,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     setState(() {
       _isLoading = true;
     });
+    print(_editedTask.projectId);
     //if task id is set we are in edit mode -> update
     if (_editedTask.id != null) {
       Provider.of<TaskProvider>(context, listen: false)
@@ -400,7 +400,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        _pomodoroNumber,
+                                        _pomodoroNumber.toString(),
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Icon(
@@ -409,8 +409,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                                       )
                                     ],
                                   ),
-                                  if (_pomodoroNumber != '0')
-                                    Text(_allPomodoroDuration)
+                                  if (_pomodoroNumber != 0)
+                                    Text(_allPomodoroDuration.toString() + 'm')
                                 ],
                               ),
                             ),

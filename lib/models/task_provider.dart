@@ -103,6 +103,16 @@ class TaskProvider with ChangeNotifier {
         }
       }
     }
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].doneDate != null) {
+        if (_tasks[i].doneDate.year == date.year &&
+            _tasks[i].doneDate.month == date.month &&
+            _tasks[i].doneDate.day == date.day &&
+            _tasks[i].isDone == true) {
+          returnList.add(_tasks[i]);
+        }
+      }
+    }
     return returnList;
   }
 
@@ -116,6 +126,11 @@ class TaskProvider with ChangeNotifier {
             _tasks[i].isDone == false) {
           returnList.add(_tasks[i]);
         }
+      }
+    }
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].date == null && _tasks[i].isDone == false) {
+        returnList.add(_tasks[i]);
       }
     }
     return returnList;

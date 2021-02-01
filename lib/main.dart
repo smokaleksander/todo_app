@@ -13,6 +13,7 @@ import 'package:pomodoro_app/screens/ProjectDetailScreen.dart';
 import 'package:pomodoro_app/screens/bottomNavManager.dart';
 import 'package:pomodoro_app/screens/homeScreen.dart';
 import 'package:pomodoro_app/screens/ProjectsScreen.dart';
+import 'package:pomodoro_app/screens/auth_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -41,9 +42,9 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.indigo[50],
           fontFamily: 'Raleway',
         ),
-        initialRoute: '/',
+        home: AuthScreen(),
         routes: {
-          '/': (ctx) => BottomNavManager(),
+          '/bottomNavManager': (ctx) => BottomNavManager(),
           ProjectsScreen.route: (ctx) => ProjectsScreen(),
           ProjectDetailScreen.route: (ctx) => ProjectDetailScreen(),
           ProfileScreen.route: (ctx) => ProfileScreen(),

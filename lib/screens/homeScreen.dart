@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pomodoro_app/models/pomodoroProvider.dart';
+import 'package:pomodoro_app/models/project_provider.dart';
 
 import 'package:pomodoro_app/widgets/task_item.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoading = false;
         });
       });
+      Provider.of<ProjectProvider>(context).fetchProjects();
+      Provider.of<PomodoroProvider>(context).fetchPomodoros();
       _isInit = false;
     }
     tasksProvider = Provider.of<TaskProvider>(context);
